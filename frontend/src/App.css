@@ -1,0 +1,231 @@
+#root, .app-container {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #fcfcff;
+  color: #333;
+}
+
+/* --- LOGO HEADER --- */
+.navbar {
+  background-color: white;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.main-logo {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #eee;
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.company-name {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #1a1a2b;
+}
+
+.brand-tagline {
+  font-size: 1rem;
+  color: #03a9f4;
+  margin-top: -5px;
+}
+
+.contact-header {
+  font-size: 0.95rem;
+  color: #555;
+  text-align: right;
+}
+
+/* --- MAIN LAYOUT --- */
+.main-layout {
+  display: flex;
+  min-height: calc(100vh - 150px);
+}
+
+/* --- SIDEBAR (Links Area) --- */
+.sidebar {
+  width: 320px;
+  background-color: #f8f9fc;
+  padding: 2.5rem 2rem;
+  border-right: 1px solid #e0e0e8;
+}
+
+.sidebar h2 {
+  font-size: 1.4rem;
+  color: #1a1a2b;
+  margin-bottom: 5px;
+}
+
+.sidebar-subtitle {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 25px;
+  line-height: 1.4;
+}
+
+.country-link-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.country-info-card {
+  display: block;
+  background-color: white;
+  border: 1px solid #e0e0e8;
+  padding: 15px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s ease;
+}
+
+.country-info-card:hover {
+  border-color: #03a9f4;
+  box-shadow: 0 4px 8px rgba(3, 169, 244, 0.1);
+  transform: translateY(-2px);
+}
+
+.country-info-card h3 {
+  color: #1a1a2b;
+  font-size: 1.1rem;
+  margin-bottom: 5px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.link-icon {
+  color: #03a9f4;
+  font-size: 1.2rem;
+}
+
+.country-info-card p {
+  font-size: 0.9rem;
+  color: #555;
+  line-height: 1.4;
+}
+
+/* --- MAIN CONTENT AREA (Home Page Layout) --- */
+.content-area {
+  flex: 1;
+  padding: 3rem 4rem;
+}
+
+.home-page-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.hero-text {
+  max-width: 700px;
+  margin-bottom: 40px;
+}
+
+.hero-text h2 {
+  font-size: 2.2rem;
+  color: #1a1a2b;
+  margin-bottom: 15px;
+}
+
+.hero-text p {
+  font-size: 1.1rem;
+  color: #444;
+  line-height: 1.6;
+}
+
+/* --- REGISTRATION FORM --- */
+.registration-section {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  border: 1px solid #eee;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+.central-form {
+  width: 100%;
+  max-width: 500px;
+  text-align: left;
+}
+
+.central-form h2 {
+  color: #1a1a2b;
+  margin-bottom: 5px;
+}
+
+.central-form p {
+  margin-bottom: 20px;
+  color: #555;
+}
+
+.apply-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.apply-form input, .country-dropdown {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  background-color: white;
+  color: #333;
+  font-family: inherit;
+}
+
+.apply-form input:focus, .country-dropdown:focus {
+  outline: none;
+  border-color: #03a9f4;
+  box-shadow: 0 0 0 3px rgba(3, 169, 244, 0.1);
+}
+
+.country-dropdown {
+  cursor: pointer;
+}
+
+.apply-form button {
+  background-color: #03a9f4;
+  color: white;
+  padding: 14px;
+  border: none;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  font-weight: 700;
+  transition: background-color 0.2s ease;
+  margin-top: 10px;
+}
+
+.apply-form button:hover {
+  background-color: #008fce;
+}
