@@ -14,8 +14,8 @@ app = FastAPI(title="NextGen Consultancy API")
 # 2. Fix CORS (The Bulletproof Version)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows literally any website to connect
-    allow_credentials=False, # ✨ Turning this OFF stops the browser from panicking
+    allow_origins=["*"],  
+    allow_credentials=False, 
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -30,12 +30,19 @@ class CandidateModel(BaseModel):
 # 4. The Cloud Database Connection Helper
 def get_db_connection():
     try:
+        # ✨ THE BULLETPROOF SANITIZER: .strip() cleans any hidden newlines or spaces instantly
+        db_host = os.getenv("DB_HOST", "").strip()
+        db_port = os.getenv("DB_PORT", "").strip()
+        db_user = os.getenv("DB_USER", "").strip()
+        db_password = os.getenv("DB_PASSWORD", "").strip()
+        db_name = os.getenv("DB_NAME", "").strip()
+
         connection = mysql.connector.connect(
-            host=os.getenv("DB_HOST"),
-            port=os.getenv("DB_PORT"),
-            user=os.getenv("DB_USER"),
-            password=os.getenv("DB_PASSWORD"),
-            database=os.getenv("DB_NAME")
+            host=db_host,
+            port=int(db_port) if db_port.isdigit() else db_port,
+            user=db_user,
+            password=db_password,
+            database=db_name
         )
         return connection
     except Error as e:
@@ -45,7 +52,6 @@ def get_db_connection():
 # 5. The Route that saves the form data
 @app.post("/register")
 async def create_candidate(candidate: CandidateModel):
-    # Connect to the cloud using the helper function!
     db = get_db_connection()
     if not db:
         raise HTTPException(status_code=500, detail="Database connection failed")
@@ -53,7 +59,6 @@ async def create_candidate(candidate: CandidateModel):
     try:
         cursor = db.cursor()
         
-        # Write the data into the cloud vault
         sql = "INSERT INTO candidates (full_name, email, phone_number, preferred_country) VALUES (%s, %s, %s, %s)"
         values = (candidate.full_name, candidate.email, candidate.phone_number, candidate.preferred_country)
         
@@ -67,7 +72,6 @@ async def create_candidate(candidate: CandidateModel):
         raise HTTPException(status_code=500, detail=f"Failed to save to database.")
         
     finally:
-        # Always close the vault doors when finished
         if 'cursor' in locals():
             cursor.close()
         if 'db' in locals() and db.is_connected():
