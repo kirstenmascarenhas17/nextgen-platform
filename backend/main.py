@@ -31,7 +31,7 @@ class CandidateModel(BaseModel):
 def get_db_connection():
     try:
         # ✨ THE OVERRIDE: We are hardcoding the host to completely bypass Render's environment variables
-        db_host = "nextgen-db-nextgen-db.e.aivencloud.com"
+        db_host = "nextgen-db-nextgen-db.a.aivencloud.com"
         
         db_port = os.getenv("DB_PORT", "").strip()
         db_user = os.getenv("DB_USER", "").strip()
