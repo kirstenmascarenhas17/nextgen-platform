@@ -43,7 +43,7 @@ function App() {
 
     try {
       // ✨ THE FIX: Pointing React to your live Render Cloud Engine!
-      const response = await fetch('https://nextgen-api-t1jg.onrender.com/register', {
+      const response = await fetch('https://nextgen-api-11jg.onrender.com/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
