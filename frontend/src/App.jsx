@@ -42,7 +42,8 @@ function App() {
     setStatusMessage('Sending...');
 
     try {
-      const response = await fetch('http://localhost:8000/register', {
+      // ✨ THE FIX: Pointing React to your live Render Cloud Engine!
+      const response = await fetch('https://nextgen-api-t1jg.onrender.com/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
