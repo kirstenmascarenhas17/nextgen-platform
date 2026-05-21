@@ -30,19 +30,23 @@ class CandidateModel(BaseModel):
 # 4. The Cloud Database Connection Helper
 def get_db_connection():
     try:
-        # ✨ THE BULLETPROOF SANITIZER: .strip() cleans any hidden newlines or spaces instantly
-        db_host = os.getenv("DB_HOST", "").strip()
+        # ✨ THE OVERRIDE: We are hardcoding the host to completely bypass Render's environment variables
+        db_host = "nextgen-db-nextgen-db.e.aivencloud.com"
+        
         db_port = os.getenv("DB_PORT", "").strip()
         db_user = os.getenv("DB_USER", "").strip()
         db_password = os.getenv("DB_PASSWORD", "").strip()
         db_name = os.getenv("DB_NAME", "").strip()
+
+        print(f"Attempting to connect to hardcoded host: {db_host}")
 
         connection = mysql.connector.connect(
             host=db_host,
             port=int(db_port) if db_port.isdigit() else db_port,
             user=db_user,
             password=db_password,
-            database=db_name
+            database=db_name,
+            ssl_disabled=False  # ✨ AIVEN SECURITY OVERRIDE
         )
         return connection
     except Error as e:
