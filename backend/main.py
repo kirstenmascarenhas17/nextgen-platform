@@ -12,9 +12,13 @@ load_dotenv()
 app = FastAPI(title="NextGen Consultancy API")
 
 # 2. Fix CORS so the React frontend can talk to Python
+# ✨ UPDATED: The VIP list now includes your local laptop and your live Vercel website!
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:5173",
+        "https://nextgen-platform-sigma.vercel.app"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
