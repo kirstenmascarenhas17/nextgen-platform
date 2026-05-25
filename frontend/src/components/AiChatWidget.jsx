@@ -12,17 +12,36 @@ export default function AiChatWidget() {
 
   const toggleChat = () => setIsOpen(!isOpen);
 
-  const handleSend = (e) => {
+  const handleSend = async (e) => {
     e.preventDefault();
     if (!inputText.trim()) return;
 
-    // Add user message to the chat
-    setMessages([...messages, { sender: 'user', text: inputText }]);
+    // 1. Immediately show the user's message in the chat
+    const userMessage = inputText;
+    setMessages(prevMessages => [...prevMessages, { sender: 'user', text: userMessage }]);
     setInputText('');
-    
-    // We will wire this up to your FastAPI Gemini backend in the next step!
-  };
 
+    try {
+      // 2. Send the message to your live Render backend
+      const response = await fetch('https://nextgen-api-11jg.onrender.com/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: userMessage }),
+      });
+
+      const data = await response.json();
+
+      // 3. Show the AI's reply in the chat
+      setMessages(prevMessages => [...prevMessages, { sender: 'ai', text: data.reply }]);
+      
+    } catch (error) {
+      console.error("Chat error:", error);
+      setMessages(prevMessages => [...prevMessages, { sender: 'ai', text: "Sorry, my brain is offline right now!" }]);
+    }
+  };
+  
   return (
     <div className="chat-widget-container">
       {/* The Chat Window (Only shows if isOpen is true) */}
