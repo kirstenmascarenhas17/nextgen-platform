@@ -13,8 +13,8 @@ from pydantic import BaseModel, Field
 # Pull the secret key from Render's vault
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-# Changed to the most stable, globally available model string
-ai_model = genai.GenerativeModel('gemini-pro')
+# Updated to the current generation active model
+ai_model = genai.GenerativeModel('gemini-2.5-flash')
 
 # Define what an incoming chat message from React looks like
 class ChatRequest(BaseModel):
