@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './AiChatWidget.css';
 
 export default function AiChatWidget() {
@@ -10,6 +10,34 @@ export default function AiChatWidget() {
   const [messages, setMessages] = useState([
     { sender: 'ai', text: "Hi! I'm the NextGen AI. Tell me your skills, and I'll recommend the best country for your profile!" }
   ]);
+
+  // Fetch chat history from MySQL when the component first loads
+  useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        const response = await fetch('https://nextgen-api-11jg.onrender.com/chat');
+        const data = await response.json();
+        
+        if (data.messages && data.messages.length > 0) {
+          // Format the database messages for React
+          const pastMessages = data.messages.map(msg => ({
+            sender: msg.sender,
+            text: msg.text
+          }));
+          
+          // Combine the default greeting with the loaded history
+          setMessages([
+            { sender: 'ai', text: "Hi! I'm the NextGen AI. Tell me your skills, and I'll recommend the best country for your profile!" },
+            ...pastMessages
+          ]);
+        }
+      } catch (error) {
+        console.error("Failed to load chat history:", error);
+      }
+    };
+
+    fetchHistory();
+  }, []); // The empty brackets mean "only run this once when the page loads"
 
   const toggleChat = () => setIsOpen(!isOpen);
 
