@@ -5,6 +5,20 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import mysql.connector
 from mysql.connector import Error
+import os
+import google.generativeai as genai
+import pydantic
+from pydantic import BaseModel, Field
+
+# Pull the secret key from Render's vault
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+
+# Load the Gemini AI model
+ai_model = genai.GenerativeModel('gemini-1.5-flash')
+
+# Define what an incoming chat message from React looks like
+class ChatRequest(BaseModel):
+    message: str
 
 # 1. Load the secure variables from the .env file
 load_dotenv()
@@ -21,7 +35,7 @@ app.add_middleware(
 )
 
 # 3. Define the data format coming from the frontend
-class CandidateModel(BaseModel):
+class CandidateModel(pydantic.BaseModel):
     full_name: str
     email: str
     phone_number: str
@@ -80,3 +94,24 @@ async def create_candidate(candidate: CandidateModel):
             cursor.close()
         if 'db' in locals() and db.is_connected():
             db.close()
+
+# 6. The Route that handles the chat messages
+@app.post("/chat")
+async def chat_with_ai(request: ChatRequest):
+    try:
+        # Give the AI its NextGen Internship personality
+        system_prompt = """
+        You are an expert Career Placement Advisor for NextGen Consultancy. 
+        Your job is to recommend the best country (UAE, Singapore, or Malta) based on the candidate's skills.
+        Keep your answers short, friendly, and professional (under 3 sentences).
+        Candidate message: 
+        """
+        
+        # Send the personality instructions + the user's message to Gemini
+        response = ai_model.generate_content(system_prompt + request.message)
+        
+        # Send the AI's answer back to the React frontend
+        return {"reply": response.text}
+        
+    except Exception as e:
+        return {"reply": f"AI connection error: {str(e)}"}
