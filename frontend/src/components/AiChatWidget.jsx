@@ -4,6 +4,7 @@ import './AiChatWidget.css';
 export default function AiChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [inputText, setInputText] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
   
   // We start with one default greeting from the AI
   const [messages, setMessages] = useState([
@@ -16,32 +17,32 @@ export default function AiChatWidget() {
     e.preventDefault();
     if (!inputText.trim()) return;
 
-    // 1. Immediately show the user's message in the chat
     const userMessage = inputText;
     setMessages(prevMessages => [...prevMessages, { sender: 'user', text: userMessage }]);
     setInputText('');
+    
+    // 1. TURN ON TYPING INDICATOR
+    setIsTyping(true); 
 
     try {
-      // 2. Send the message to your live Render backend
       const response = await fetch('https://nextgen-api-11jg.onrender.com/chat', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: userMessage }),
       });
 
       const data = await response.json();
-
-      // 3. Show the AI's reply in the chat
       setMessages(prevMessages => [...prevMessages, { sender: 'ai', text: data.reply }]);
       
     } catch (error) {
       console.error("Chat error:", error);
       setMessages(prevMessages => [...prevMessages, { sender: 'ai', text: "Sorry, my brain is offline right now!" }]);
+    } finally {
+      // 2. TURN OFF TYPING INDICATOR
+      setIsTyping(false); 
     }
   };
-  
+
   return (
     <div className="chat-widget-container">
       {/* The Chat Window (Only shows if isOpen is true) */}
@@ -58,6 +59,14 @@ export default function AiChatWidget() {
                 {msg.text}
               </div>
             ))}
+            
+            {isTyping && (
+              <div className="message ai-message typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            )}
           </div>
 
           <form onSubmit={handleSend} className="chat-footer">

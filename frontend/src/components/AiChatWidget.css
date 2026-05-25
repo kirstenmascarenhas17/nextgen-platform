@@ -113,3 +113,29 @@
   cursor: pointer;
   font-weight: bold;
 }
+/* --- TYPING ANIMATION --- */
+.typing-indicator {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  padding: 14px 16px;
+  width: fit-content;
+}
+
+.typing-indicator span {
+  display: block;
+  width: 6px;
+  height: 6px;
+  background-color: #64748b;
+  border-radius: 50%;
+  animation: bounce 1.4s infinite ease-in-out both;
+}
+
+/* Stagger the animation so they bounce one after another */
+.typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+.typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1); }
+}
