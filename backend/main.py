@@ -30,8 +30,8 @@ class CandidateModel(BaseModel):
 # 4. The Cloud Database Connection Helper
 def get_db_connection():
     try:
-        # ✨ THE OVERRIDE: We are hardcoding the host to completely bypass Render's environment variables
-        db_host = "nextgen-db-nextgen-db.e.aivencloud.com"
+        # ✨ THE IP BYPASS: Skipping Render's broken DNS entirely
+        db_host = "64.227.186.189"
         
         db_port = os.getenv("DB_PORT", "").strip()
         db_user = os.getenv("DB_USER", "").strip()
