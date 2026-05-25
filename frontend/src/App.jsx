@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import logoImg from './assets/logo.jpg'
 import './App.css'
+import AiChatWidget from './components/AiChatWidget';
 
 const COUNTRY_INFO = [
   { 
@@ -159,6 +160,7 @@ function App() {
         </section>
 
       </main>
+      <AiChatWidget />
     </div>
   )
 }
