@@ -2,26 +2,19 @@ import os
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 import mysql.connector
 from mysql.connector import Error
-import os
 import google.generativeai as genai
-import pydantic
-from pydantic import BaseModel, Field
+
+# 1. Load the secure variables from the .env file FIRST
+load_dotenv()
 
 # Pull the secret key from Render's vault
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 # Updated to the current generation active model
 ai_model = genai.GenerativeModel('gemini-2.5-flash')
-
-# Define what an incoming chat message from React looks like
-class ChatRequest(BaseModel):
-    message: str
-
-# 1. Load the secure variables from the .env file
-load_dotenv()
 
 app = FastAPI(title="NextGen Consultancy API")
 
@@ -34,12 +27,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 3. Define the data format coming from the frontend
-class CandidateModel(pydantic.BaseModel):
+# 3. Define the data formats
+class CandidateModel(BaseModel):
     full_name: str
     email: str
     phone_number: str
     preferred_country: str
+
+class ChatRequest(BaseModel):
+    message: str
 
 # 4. The Cloud Database Connection Helper
 def get_db_connection():
@@ -56,7 +52,7 @@ def get_db_connection():
 
         connection = mysql.connector.connect(
             host=db_host,
-            port=int(db_port) if db_port.isdigit() else db_port,
+            port=int(db_port) if db_port and db_port.isdigit() else db_port,
             user=db_user,
             password=db_password,
             database=db_name,
@@ -66,6 +62,26 @@ def get_db_connection():
     except Error as e:
         print(f"Error connecting to MySQL: {e}")
         return None
+
+# Startup: Create the chat_history table if it doesn't exist yet
+try:
+    conn = get_db_connection()
+    if conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS chat_history (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                sender VARCHAR(10) NOT NULL,
+                message TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        conn.commit()
+        cursor.close()
+        conn.close()
+        print("✅ Chat history table is ready!")
+except Exception as e:
+    print(f"❌ Database connection error: {e}")
 
 # 5. The Route that saves the form data
 @app.post("/register")
@@ -95,10 +111,38 @@ async def create_candidate(candidate: CandidateModel):
         if 'db' in locals() and db.is_connected():
             db.close()
 
-# 6. The Route that handles the chat messages
+# 6. The Route to load previous chat messages
+@app.get("/chat")
+async def get_chat_history():
+    try:
+        conn = get_db_connection()
+        if not conn:
+            return {"messages": [], "error": "Database connection failed"}
+            
+        cursor = conn.cursor(dictionary=True)
+        # Fetch all messages in chronological order
+        cursor.execute("SELECT sender, message AS text FROM chat_history ORDER BY created_at ASC")
+        messages = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return {"messages": messages}
+    except Exception as e:
+        return {"messages": [], "error": str(e)}
+
+# 7. The Route that handles new chat messages
 @app.post("/chat")
 async def chat_with_ai(request: ChatRequest):
     try:
+        # Save the User's message to the database
+        conn = get_db_connection()
+        if conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "INSERT INTO chat_history (sender, message) VALUES (%s, %s)", 
+                ("user", request.message)
+            )
+            conn.commit()
+
         # Give the AI its NextGen Internship personality
         system_prompt = """
         You are an expert Career Placement Advisor for NextGen Consultancy. 
@@ -109,9 +153,20 @@ async def chat_with_ai(request: ChatRequest):
         
         # Send the personality instructions + the user's message to Gemini
         response = ai_model.generate_content(system_prompt + request.message)
+        ai_reply = response.text
         
+        # Save the AI's reply to the database
+        if conn:
+            cursor.execute(
+                "INSERT INTO chat_history (sender, message) VALUES (%s, %s)", 
+                ("ai", ai_reply)
+            )
+            conn.commit()
+            cursor.close()
+            conn.close()
+
         # Send the AI's answer back to the React frontend
-        return {"reply": response.text}
+        return {"reply": ai_reply}
         
     except Exception as e:
         return {"reply": f"AI connection error: {str(e)}"}
