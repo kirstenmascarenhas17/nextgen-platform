@@ -172,3 +172,8 @@ async def chat_with_ai(request: ChatRequest):
         
     except Exception as e:
         return {"reply": f"AI connection error: {str(e)}"}
+
+# 8. The Health Check Route (Keeps the server awake!)
+@app.get("/health")
+async def health_check():
+    return {"status": "NextGen API is awake and running!"}
