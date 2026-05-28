@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import './AiChatWidget.css';
 
+// ✨ FIXED: Importing the premium Robot icon
+import { FaRobot } from 'react-icons/fa';
+
 export default function AiChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [inputText, setInputText] = useState('');
@@ -11,11 +14,9 @@ export default function AiChatWidget() {
     { sender: 'ai', text: "Hi! I'm the NextGen AI. Tell me your skills, and I'll recommend the best country for your profile!" }
   ]);
 
-  // ✨ NEW: Helper function to get or create a unique user ID
   const getSessionId = () => {
     let sessionId = localStorage.getItem('nextgen_session_id');
     if (!sessionId) {
-      // Create a random ID like 'user_x7b39m'
       sessionId = 'user_' + Math.random().toString(36).substring(2, 15);
       localStorage.setItem('nextgen_session_id', sessionId);
     }
@@ -24,10 +25,9 @@ export default function AiChatWidget() {
 
   useEffect(() => {
     const fetchHistory = async () => {
-      const sessionId = getSessionId(); // Grab the user's nametag
+      const sessionId = getSessionId(); 
 
       try {
-        // ✨ NEW: Ask the backend ONLY for this specific user's history
         const response = await fetch(`https://nextgen-api-11jg.onrender.com/chat?session_id=${sessionId}`);
         const data = await response.json();
         
@@ -59,7 +59,7 @@ export default function AiChatWidget() {
     if (!inputText.trim()) return;
 
     const userMessage = inputText;
-    const sessionId = getSessionId(); // Grab the user's nametag
+    const sessionId = getSessionId(); 
 
     setMessages(prevMessages => [...prevMessages, { sender: 'user', text: userMessage }]);
     setInputText('');
@@ -69,7 +69,6 @@ export default function AiChatWidget() {
       const response = await fetch('https://nextgen-api-11jg.onrender.com/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        // ✨ NEW: Attach the nametag to the message payload
         body: JSON.stringify({ message: userMessage, session_id: sessionId }),
       });
 
@@ -89,7 +88,7 @@ export default function AiChatWidget() {
       {isOpen && (
         <div className="chat-window">
           <div className="chat-header">
-            <h3>NextGen AI Assistant</h3>
+            <h3><FaRobot style={{ marginRight: '8px', verticalAlign: 'middle' }} /> NextGen AI</h3>
             <button onClick={toggleChat} className="close-btn">✖</button>
           </div>
           
@@ -133,7 +132,9 @@ export default function AiChatWidget() {
 
       {!isOpen && (
         <button onClick={toggleChat} className="floating-chat-btn">
-          💬 Chat with AI
+          {/* ✨ FIXED: Professional AI Robot Icon */}
+          <FaRobot size={22} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
+          Chat with AI
         </button>
       )}
     </div>

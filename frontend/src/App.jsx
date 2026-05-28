@@ -1,7 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import logoImg from './assets/logo.jpg'
 import './App.css'
 import AiChatWidget from './components/AiChatWidget';
+
+// ✨ FIXED: Added Phone, Envelope, and ArrowUp icons
+import { FaFacebook, FaInstagram, FaLinkedin, FaWhatsapp, FaPhoneAlt, FaEnvelope, FaArrowUp } from 'react-icons/fa';
+import { IoCheckmarkCircle } from 'react-icons/io5';
 
 const COUNTRY_INFO = [
   { 
@@ -22,8 +26,6 @@ const COUNTRY_INFO = [
 ];
 
 function App() {
-  // --- THE BRAIN: Memory (State) and Logic (Functions) ---
-  
   const [formData, setFormData] = useState({
     full_name: '',
     email: '',
@@ -32,6 +34,23 @@ function App() {
   });
 
   const [statusMessage, setStatusMessage] = useState('');
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 300) {
+        setShowScrollTop(true);
+      } else {
+        setShowScrollTop(false);
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -43,12 +62,9 @@ function App() {
     setStatusMessage('Sending...');
 
     try {
-      // ✨ THE FIX: Pointing React to your live Render Cloud Engine!
       const response = await fetch('https://nextgen-api-11jg.onrender.com/register', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
@@ -56,7 +72,7 @@ function App() {
 
       if (response.ok) {
         setStatusMessage('Success! Your profile has been registered.');
-        setFormData({ full_name: '', email: '', phone_number: '', preferred_country: '' }); // Clears form
+        setFormData({ full_name: '', email: '', phone_number: '', preferred_country: '' });
       } else {
         setStatusMessage(`Error: ${data.detail}`);
       }
@@ -66,22 +82,27 @@ function App() {
     }
   };
 
-  // --- THE FACE: What the user actually sees (HTML/JSX) ---
   return (
-    <div className="app-container">
-      <header className="navbar">
+    <div className="app-container" id="home">
+      
+      <header className="navbar sticky-header">
         <div className="logo-section">
           <img src={logoImg} alt="NextGen Consultancy Logo" className="main-logo" />
           <div className="logo-text">
             <h1 className="company-name">NextGen Consultancy</h1>
-            <p className="brand-tagline">Adding Value to Lives!</p>
           </div>
         </div>
-        <p className="contact-header">Call Us: +91 98765 43210 | email: jobs@nextgen.com</p>
+        
+        <nav className="desktop-nav">
+          <a href="#home">Home</a>
+          <a href="#about">About Us</a>
+          <a href="#services">Services</a>
+          <a href="#contact">Contact Us</a>
+          <a href="#register" className="nav-register-btn">Candidate Registration</a>
+        </nav>
       </header>
       
       <main className="main-layout">
-        
         <aside className="sidebar">
           <h2>Explore Destinations</h2>
           <p className="sidebar-subtitle">Click to learn more about living and working abroad.</p>
@@ -103,48 +124,32 @@ function App() {
         </aside>
 
         <section className="content-area home-page-layout">
-          <div className="hero-text">
+          
+          <div className="hero-text" id="about">
             <h2>Your Global Career Starts Here.</h2>
             <p>We connect skilled professionals with verified employers across the globe. Register your profile today, and our placement team will match you with the perfect opportunity.</p>
           </div>
 
-          <div className="registration-section central-form">
+          <div className="trust-ribbon" id="services">
+            <p>Trusted placement network across:</p>
+            <div className="trust-badges">
+              <span><IoCheckmarkCircle className="check-icon" /> UAE</span>
+              <span><IoCheckmarkCircle className="check-icon" /> Singapore</span>
+              <span><IoCheckmarkCircle className="check-icon" /> Malta</span>
+              <span><IoCheckmarkCircle className="check-icon" /> Europe</span>
+            </div>
+          </div>
+
+          <div className="registration-section central-form" id="register">
             <h2>Candidate Registration</h2>
             <p>Secure your spot in our global database.</p>
             
             <form className="apply-form" onSubmit={handleSubmit}>
-              <input 
-                type="text" 
-                name="full_name"
-                placeholder="Full Name" 
-                value={formData.full_name}
-                onChange={handleInputChange}
-                required 
-              />
-              <input 
-                type="email" 
-                name="email"
-                placeholder="Email Address" 
-                value={formData.email}
-                onChange={handleInputChange}
-                required 
-              />
-              <input 
-                type="tel" 
-                name="phone_number"
-                placeholder="Phone Number (Required)" 
-                value={formData.phone_number}
-                onChange={handleInputChange}
-                required 
-              />
+              <input type="text" name="full_name" placeholder="Full Name" value={formData.full_name} onChange={handleInputChange} required />
+              <input type="email" name="email" placeholder="Email Address" value={formData.email} onChange={handleInputChange} required />
+              <input type="tel" name="phone_number" placeholder="Phone Number (Required)" value={formData.phone_number} onChange={handleInputChange} required />
               
-              <select 
-                name="preferred_country"
-                className="country-dropdown"
-                value={formData.preferred_country}
-                onChange={handleInputChange}
-                required
-              >
+              <select name="preferred_country" className="country-dropdown" value={formData.preferred_country} onChange={handleInputChange} required>
                 <option value="" disabled>Select Preferred Country...</option>
                 <option value="UAE">United Arab Emirates (UAE)</option>
                 <option value="Singapore">Singapore</option>
@@ -153,13 +158,50 @@ function App() {
               </select>
 
               <button type="submit">Submit Profile</button>
-              
-              {statusMessage && <p style={{ marginTop: '10px', color: '#03a9f4', fontWeight: 'bold' }}>{statusMessage}</p>}
+              {statusMessage && <p className="status-msg">{statusMessage}</p>}
             </form>
           </div>
         </section>
-
       </main>
+
+      <footer className="premium-footer" id="contact">
+        <div className="footer-grid">
+          <div className="footer-col">
+            <h3>NextGen Consultancy</h3>
+            <p>Adding Value to Lives!</p>
+          </div>
+          <div className="footer-col">
+            <h3>Get In Touch</h3>
+            {/* ✨ FIXED: Professional Phone and Email Icons */}
+            <p><FaPhoneAlt size={16} style={{ marginRight: '10px', color: '#38bdf8', verticalAlign: 'middle' }} /> +91 98765 43210</p>
+            <p><FaEnvelope size={16} style={{ marginRight: '10px', color: '#38bdf8', verticalAlign: 'middle' }} /> jobs@nextgen.com</p>
+          </div>
+          <div className="footer-col">
+            <h3>Follow Us</h3>
+            <div className="social-links">
+              <a href="#"><FaFacebook size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} /> Facebook</a>
+              <a href="#"><FaInstagram size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} /> Instagram</a>
+              <a href="#"><FaLinkedin size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} /> LinkedIn</a>
+            </div>
+          </div>
+        </div>
+        <div className="footer-bottom">
+          <p>&copy; 2026 NextGen Consultancy. All rights reserved.</p>
+        </div>
+      </footer>
+
+      <a href="https://wa.me/919876543210" target="_blank" rel="noopener noreferrer" className="floating-whatsapp">
+        <FaWhatsapp size={24} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
+        WhatsApp Us
+      </a>
+
+      {showScrollTop && (
+        <button onClick={scrollToTop} className="scroll-to-top">
+          {/* ✨ FIXED: Professional Up Arrow Icon */}
+          <FaArrowUp size={18} />
+        </button>
+      )}
+
       <AiChatWidget />
     </div>
   )
