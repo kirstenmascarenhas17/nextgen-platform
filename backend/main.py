@@ -36,6 +36,7 @@ class CandidateModel(BaseModel):
 
 class ChatRequest(BaseModel):
     message: str
+    session_id: str
 
 # 4. The Cloud Database Connection Helper
 def get_db_connection():
@@ -63,14 +64,15 @@ def get_db_connection():
         print(f"Error connecting to MySQL: {e}")
         return None
 
-# Startup: Create the chat_history table if it doesn't exist yet
+# Startup: Create the new private user_chats table
 try:
     conn = get_db_connection()
     if conn:
         cursor = conn.cursor()
         cursor.execute("""
-            CREATE TABLE IF NOT EXISTS chat_history (
+            CREATE TABLE IF NOT EXISTS user_chats (
                 id INT AUTO_INCREMENT PRIMARY KEY,
+                session_id VARCHAR(100) NOT NULL,
                 sender VARCHAR(10) NOT NULL,
                 message TEXT NOT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -79,7 +81,7 @@ try:
         conn.commit()
         cursor.close()
         conn.close()
-        print("✅ Chat history table is ready!")
+        print("✅ Private chat table is ready!")
 except Exception as e:
     print(f"❌ Database connection error: {e}")
 
@@ -113,15 +115,18 @@ async def create_candidate(candidate: CandidateModel):
 
 # 6. The Route to load previous chat messages
 @app.get("/chat")
-async def get_chat_history():
+async def get_chat_history(session_id: str): # ✨ Now requires a session_id
     try:
         conn = get_db_connection()
         if not conn:
             return {"messages": [], "error": "Database connection failed"}
             
         cursor = conn.cursor(dictionary=True)
-        # Fetch all messages in chronological order
-        cursor.execute("SELECT sender, message AS text FROM chat_history ORDER BY created_at ASC")
+        # ✨ Only pull messages for this specific user
+        cursor.execute(
+            "SELECT sender, message AS text FROM user_chats WHERE session_id = %s ORDER BY created_at ASC",
+            (session_id,)
+        )
         messages = cursor.fetchall()
         cursor.close()
         conn.close()
@@ -133,17 +138,16 @@ async def get_chat_history():
 @app.post("/chat")
 async def chat_with_ai(request: ChatRequest):
     try:
-        # Save the User's message to the database
         conn = get_db_connection()
         if conn:
             cursor = conn.cursor()
+            # ✨ Save the session_id to the database
             cursor.execute(
-                "INSERT INTO chat_history (sender, message) VALUES (%s, %s)", 
-                ("user", request.message)
+                "INSERT INTO user_chats (session_id, sender, message) VALUES (%s, %s, %s)", 
+                (request.session_id, "user", request.message)
             )
             conn.commit()
 
-        # Give the AI its NextGen Internship personality
         system_prompt = """
         You are an expert Career Placement Advisor for NextGen Consultancy. 
         Your job is to recommend the best country (UAE, Singapore, or Malta) based on the candidate's skills.
@@ -151,21 +155,19 @@ async def chat_with_ai(request: ChatRequest):
         Candidate message: 
         """
         
-        # Send the personality instructions + the user's message to Gemini
         response = ai_model.generate_content(system_prompt + request.message)
         ai_reply = response.text
         
-        # Save the AI's reply to the database
         if conn:
+            # ✨ Save the AI's reply with the same session_id
             cursor.execute(
-                "INSERT INTO chat_history (sender, message) VALUES (%s, %s)", 
-                ("ai", ai_reply)
+                "INSERT INTO user_chats (session_id, sender, message) VALUES (%s, %s, %s)", 
+                (request.session_id, "ai", ai_reply)
             )
             conn.commit()
             cursor.close()
             conn.close()
 
-        # Send the AI's answer back to the React frontend
         return {"reply": ai_reply}
         
     except Exception as e:
