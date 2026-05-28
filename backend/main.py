@@ -41,7 +41,7 @@ class ChatRequest(BaseModel):
 def get_db_connection():
     try:
         # ✨ THE IP BYPASS: Skipping Render's broken DNS entirely
-        db_host = "64.227.186.189"
+        db_host = "168.144.86.79"
         
         db_port = os.getenv("DB_PORT", "").strip()
         db_user = os.getenv("DB_USER", "").strip()
