@@ -171,7 +171,19 @@ async def chat_with_ai(request: ChatRequest):
     except Exception as e:
         return {"reply": f"AI connection error: {str(e)}"}
 
-# 8. The Health Check Route (Keeps the server awake!)
+# 8. The Health Check Route (Keeps BOTH the server and database awake!)
 @app.get("/health")
 async def health_check():
-    return {"status": "NextGen API is awake and running!"}
+    try:
+        # ✨ THE 'FOREVER' HACK: Send a tiny, invisible query to Aiven to reset its sleep timer
+        conn = get_db_connection()
+        if conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT 1") # A microscopic query just to say "I'm here!"
+            cursor.close()
+            conn.close()
+            return {"status": "NextGen API & Aiven Database are fully awake and running!"}
+        else:
+            return {"status": "API is awake, but Database is unreachable!"}
+    except Exception as e:
+        return {"status": f"API is awake, but DB threw an error: {str(e)}"}
