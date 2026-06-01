@@ -1,7 +1,9 @@
 import os
 import re
+import smtplib                                  
+from email.message import EmailMessage
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, BackgroundTasks # ✨ FIXED: Added BackgroundTasks here
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, field_validator
 import mysql.connector
@@ -106,10 +108,57 @@ try:
 except Exception as e:
     print(f"❌ Database connection error: {e}")
 
+# ✨ NEW: The Automated Welcome Email Function
+def send_welcome_email(candidate_email: str, candidate_name: str):
+    sender_email = os.getenv("EMAIL_SENDER")
+    sender_password = os.getenv("EMAIL_PASSWORD")
+
+    if not sender_email or not sender_password:
+        print("Email credentials missing! Skipping email.")
+        return
+
+    msg = EmailMessage()
+    msg['Subject'] = 'Welcome to NextGen Consultancy - Global Placement'
+    msg['From'] = f"NextGen Consultancy <{sender_email}>"
+    msg['To'] = candidate_email
+
+    # Premium HTML Email Template
+    html_content = f"""
+    <html>
+        <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 0 auto;">
+            <div style="background-color: #0284c7; padding: 20px; text-align: center;">
+                <h1 style="color: white; margin: 0;">NextGen Consultancy</h1>
+            </div>
+            <div style="padding: 20px; border: 1px solid #ddd; border-top: none;">
+                <h2 style="color: #0284c7;">Welcome, {candidate_name}!</h2>
+                <p>Thank you for registering your profile with us. Our placement team has successfully received your details and secured your spot in our global database.</p>
+                <p>We are currently reviewing placement opportunities across our verified network in the <strong>UAE, Singapore, Malta, and Europe</strong>.</p>
+                <p>Our advisors will reach out to you directly via phone or email as soon as a suitable role matches your specific expertise.</p>
+                <br>
+                <p>Best Regards,</p>
+                <p><strong>The NextGen Placement Team</strong></p>
+                <p style="font-size: 0.9em; color: #666;">Adding Value to Lives!</p>
+            </div>
+        </body>
+    </html>
+    """
+    
+    msg.set_content("Welcome to NextGen Consultancy! Your profile has been registered successfully.")
+    msg.add_alternative(html_content, subtype='html')
+
+    try:
+        # Connect to Gmail's secure server and send!
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+            smtp.login(sender_email, sender_password)
+            smtp.send_message(msg)
+        print(f"✅ Welcome email successfully dispatched to {candidate_email}")
+    except Exception as e:
+        print(f"❌ Failed to send email to {candidate_email}. Error: {e}")
+            
 # 5. The Route that saves the form data
 @app.post("/register")
-@limiter.limit("5/minute") # ✨ NEW: Max 5 submissions per minute per IP
-async def create_candidate(request: Request, candidate: CandidateModel):
+@limiter.limit("5/minute")
+async def create_candidate(request: Request, candidate: CandidateModel, background_tasks: BackgroundTasks): # ✨ FIXED: Added background_tasks parameter
     db = get_db_connection()
     if not db:
         raise HTTPException(status_code=500, detail="Database connection failed")
@@ -121,6 +170,10 @@ async def create_candidate(request: Request, candidate: CandidateModel):
         
         cursor.execute(sql, values)
         db.commit()
+        
+        # ✨ FIXED: Fire off the welcome email in the background!
+        background_tasks.add_task(send_welcome_email, candidate.email, candidate.full_name)
+        
         return {"message": "Candidate profile successfully uploaded to the cloud!"}
         
     except Error as e:
@@ -133,7 +186,7 @@ async def create_candidate(request: Request, candidate: CandidateModel):
 
 # 6. The Route to load previous chat messages
 @app.get("/chat")
-@limiter.limit("20/minute") # ✨ NEW: Rate limit for loading history
+@limiter.limit("20/minute")
 async def get_chat_history(request: Request, session_id: str): 
     try:
         conn = get_db_connection()
@@ -154,7 +207,7 @@ async def get_chat_history(request: Request, session_id: str):
 
 # 7. The Route that handles new chat messages
 @app.post("/chat")
-@limiter.limit("10/minute") # ✨ NEW: Protects Gemini API from spam
+@limiter.limit("10/minute") 
 async def chat_with_ai(request: Request, payload: ChatRequest):
     try:
         conn = get_db_connection()
