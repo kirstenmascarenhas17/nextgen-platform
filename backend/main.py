@@ -147,8 +147,10 @@ def send_welcome_email(candidate_email: str, candidate_name: str):
     msg.add_alternative(html_content, subtype='html')
 
     try:
-        # Connect to Gmail's secure server and send!
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+        # ✨ FIXED: Switched from Port 465 (SSL) to Port 587 (TLS) to bypass cloud network blocks
+        with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
+            smtp.ehlo()          # Identify ourselves to Google's server
+            smtp.starttls()      # Secure the connection with TLS
             smtp.login(sender_email, sender_password)
             smtp.send_message(msg)
         print(f"✅ Welcome email successfully dispatched to {candidate_email}")
