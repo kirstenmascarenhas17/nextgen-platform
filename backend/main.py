@@ -3,7 +3,7 @@ import re
 import smtplib                                  
 from email.message import EmailMessage
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Request, BackgroundTasks # ✨ FIXED: Added BackgroundTasks here
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, field_validator
 import mysql.connector
@@ -108,21 +108,21 @@ try:
 except Exception as e:
     print(f"❌ Database connection error: {e}")
 
-# ✨ NEW: The Automated Welcome Email Function
+# ✨ DEBUG MODE: The Automated Welcome Email Function
 def send_welcome_email(candidate_email: str, candidate_name: str):
     sender_email = os.getenv("EMAIL_SENDER")
     sender_password = os.getenv("EMAIL_PASSWORD")
 
     if not sender_email or not sender_password:
-        print("Email credentials missing! Skipping email.")
-        return
+        # flush=True forces Render to print this immediately
+        print("❌ Email credentials missing in Render Environment!", flush=True) 
+        raise Exception("Missing EMAIL_SENDER or EMAIL_PASSWORD in environment variables")
 
     msg = EmailMessage()
     msg['Subject'] = 'Welcome to NextGen Consultancy - Global Placement'
     msg['From'] = f"NextGen Consultancy <{sender_email}>"
     msg['To'] = candidate_email
 
-    # Premium HTML Email Template
     html_content = f"""
     <html>
         <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 0 auto;">
@@ -147,20 +147,21 @@ def send_welcome_email(candidate_email: str, candidate_name: str):
     msg.add_alternative(html_content, subtype='html')
 
     try:
-        # ✨ FIXED: Switched from Port 465 (SSL) to Port 587 (TLS) to bypass cloud network blocks
+        print(f"🔄 Attempting to connect to Google SMTP for {candidate_email}...", flush=True)
         with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
-            smtp.ehlo()          # Identify ourselves to Google's server
-            smtp.starttls()      # Secure the connection with TLS
+            smtp.ehlo()          
+            smtp.starttls()      
             smtp.login(sender_email, sender_password)
             smtp.send_message(msg)
-        print(f"✅ Welcome email successfully dispatched to {candidate_email}")
+        print(f"✅ Welcome email successfully dispatched!", flush=True)
     except Exception as e:
-        print(f"❌ Failed to send email to {candidate_email}. Error: {e}")
+        print(f"🔥 CRITICAL SMTP ERROR: {e}", flush=True)
+        raise e # Force the error upward so the frontend sees it!
             
 # 5. The Route that saves the form data
 @app.post("/register")
 @limiter.limit("5/minute")
-async def create_candidate(request: Request, candidate: CandidateModel, background_tasks: BackgroundTasks): # ✨ FIXED: Added background_tasks parameter
+async def create_candidate(request: Request, candidate: CandidateModel): 
     db = get_db_connection()
     if not db:
         raise HTTPException(status_code=500, detail="Database connection failed")
@@ -173,13 +174,15 @@ async def create_candidate(request: Request, candidate: CandidateModel, backgrou
         cursor.execute(sql, values)
         db.commit()
         
-        # ✨ FIXED: Fire off the welcome email in the background!
-        background_tasks.add_task(send_welcome_email, candidate.email, candidate.full_name)
+        # ✨ DEBUG MODE: Running this directly. If it fails, the whole route fails!
+        send_welcome_email(candidate.email, candidate.full_name)
         
         return {"message": "Candidate profile successfully uploaded to the cloud!"}
         
-    except Error as e:
-        raise HTTPException(status_code=500, detail=f"Failed to save to database.")
+    except Exception as e:
+        # This catches the email error and pushes it directly to your Render logs and React frontend
+        print(f"🚨 ROUTE FAILED: {str(e)}", flush=True)
+        raise HTTPException(status_code=500, detail=f"Server Error: {str(e)}")
     finally:
         if 'cursor' in locals():
             cursor.close()
