@@ -1,13 +1,17 @@
 import os
+import re
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 import mysql.connector
 from mysql.connector import Error
 import google.generativeai as genai
-import re
-from pydantic import BaseModel, Field, field_validator
+
+# ✨ NEW: Import the Security and Rate Limiting tools
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 # 1. Load the secure variables from the .env file FIRST
 load_dotenv()
@@ -18,7 +22,14 @@ genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 # Updated to the current generation active model
 ai_model = genai.GenerativeModel('gemini-2.5-flash')
 
+# ✨ NEW: Initialize the Rate Limiter (Tracks users by their IP address)
+limiter = Limiter(key_func=get_remote_address)
+
 app = FastAPI(title="NextGen Consultancy API")
+
+# ✨ NEW: Tell FastAPI to use the Limiter and handle blocked requests cleanly
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # 2. Fix CORS (The Bulletproof Version)
 app.add_middleware(
@@ -36,19 +47,14 @@ class CandidateModel(BaseModel):
     phone_number: str
     preferred_country: str
 
-    # ✨ NEW: Strict Indian Phone Number Validator
     @field_validator('phone_number')
     @classmethod
     def validate_indian_phone(cls, value: str) -> str:
-        # Remove any spaces, dashes, or +91 if the user typed them
         clean_number = re.sub(r'[\s\-+]', '', value)
         if clean_number.startswith('91') and len(clean_number) > 10:
-            clean_number = clean_number[2:] # Strip the country code
-
-        # Match exactly 10 digits starting with 6-9
+            clean_number = clean_number[2:]
         if not re.match(r'^[6-9]\d{9}$', clean_number):
             raise ValueError('Invalid phone number. Must be a valid 10-digit Indian mobile number.')
-            
         return clean_number
 
 class ChatRequest(BaseModel):
@@ -58,7 +64,6 @@ class ChatRequest(BaseModel):
 # 4. The Cloud Database Connection Helper
 def get_db_connection():
     try:
-        # ✨ THE IP BYPASS: Skipping Render's broken DNS entirely
         db_host = "nextgen-db-nextgen-db.e.aivencloud.com"
         
         db_port = os.getenv("DB_PORT", "").strip()
@@ -66,16 +71,14 @@ def get_db_connection():
         db_password = os.getenv("DB_PASSWORD", "").strip()
         db_name = os.getenv("DB_NAME", "").strip()
 
-        print(f"Attempting to connect to secure host: {db_host}")
-
         connection = mysql.connector.connect(
             host=db_host,
             port=int(db_port) if db_port and db_port.isdigit() else db_port,
             user=db_user,
             password=db_password,
             database=db_name,
-            ssl_ca="ca.pem",      # ✨ NEW: Tells Python where the certificate is
-            ssl_verify_cert=True  # ✨ NEW: Forces a secure connection
+            ssl_ca="ca.pem",      
+            ssl_verify_cert=True  
         )
         return connection
     except Error as e:
@@ -105,26 +108,23 @@ except Exception as e:
 
 # 5. The Route that saves the form data
 @app.post("/register")
-async def create_candidate(candidate: CandidateModel):
+@limiter.limit("5/minute") # ✨ NEW: Max 5 submissions per minute per IP
+async def create_candidate(request: Request, candidate: CandidateModel):
     db = get_db_connection()
     if not db:
         raise HTTPException(status_code=500, detail="Database connection failed")
     
     try:
         cursor = db.cursor()
-        
         sql = "INSERT INTO candidates (full_name, email, phone_number, preferred_country) VALUES (%s, %s, %s, %s)"
         values = (candidate.full_name, candidate.email, candidate.phone_number, candidate.preferred_country)
         
         cursor.execute(sql, values)
         db.commit()
-        
         return {"message": "Candidate profile successfully uploaded to the cloud!"}
         
     except Error as e:
-        print(f"Database error: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to save to database.")
-        
     finally:
         if 'cursor' in locals():
             cursor.close()
@@ -133,7 +133,8 @@ async def create_candidate(candidate: CandidateModel):
 
 # 6. The Route to load previous chat messages
 @app.get("/chat")
-async def get_chat_history(session_id: str): 
+@limiter.limit("20/minute") # ✨ NEW: Rate limit for loading history
+async def get_chat_history(request: Request, session_id: str): 
     try:
         conn = get_db_connection()
         if not conn:
@@ -153,14 +154,15 @@ async def get_chat_history(session_id: str):
 
 # 7. The Route that handles new chat messages
 @app.post("/chat")
-async def chat_with_ai(request: ChatRequest):
+@limiter.limit("10/minute") # ✨ NEW: Protects Gemini API from spam
+async def chat_with_ai(request: Request, payload: ChatRequest):
     try:
         conn = get_db_connection()
         if conn:
             cursor = conn.cursor()
             cursor.execute(
                 "INSERT INTO user_chats (session_id, sender, message) VALUES (%s, %s, %s)", 
-                (request.session_id, "user", request.message)
+                (payload.session_id, "user", payload.message)
             )
             conn.commit()
 
@@ -171,13 +173,13 @@ async def chat_with_ai(request: ChatRequest):
         Candidate message: 
         """
         
-        response = ai_model.generate_content(system_prompt + request.message)
+        response = ai_model.generate_content(system_prompt + payload.message)
         ai_reply = response.text
         
         if conn:
             cursor.execute(
                 "INSERT INTO user_chats (session_id, sender, message) VALUES (%s, %s, %s)", 
-                (request.session_id, "ai", ai_reply)
+                (payload.session_id, "ai", ai_reply)
             )
             conn.commit()
             cursor.close()
@@ -192,11 +194,10 @@ async def chat_with_ai(request: ChatRequest):
 @app.get("/health")
 async def health_check():
     try:
-        # ✨ THE 'FOREVER' HACK: Send a tiny, invisible query to Aiven to reset its sleep timer
         conn = get_db_connection()
         if conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT 1") # A microscopic query just to say "I'm here!"
+            cursor.execute("SELECT 1") 
             cursor.close()
             conn.close()
             return {"status": "NextGen API & Aiven Database are fully awake and running!"}
