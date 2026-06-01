@@ -6,6 +6,8 @@ from pydantic import BaseModel, Field
 import mysql.connector
 from mysql.connector import Error
 import google.generativeai as genai
+import re
+from pydantic import BaseModel, Field, field_validator
 
 # 1. Load the secure variables from the .env file FIRST
 load_dotenv()
@@ -33,6 +35,21 @@ class CandidateModel(BaseModel):
     email: str
     phone_number: str
     preferred_country: str
+
+    # ✨ NEW: Strict Indian Phone Number Validator
+    @field_validator('phone_number')
+    @classmethod
+    def validate_indian_phone(cls, value: str) -> str:
+        # Remove any spaces, dashes, or +91 if the user typed them
+        clean_number = re.sub(r'[\s\-+]', '', value)
+        if clean_number.startswith('91') and len(clean_number) > 10:
+            clean_number = clean_number[2:] # Strip the country code
+
+        # Match exactly 10 digits starting with 6-9
+        if not re.match(r'^[6-9]\d{9}$', clean_number):
+            raise ValueError('Invalid phone number. Must be a valid 10-digit Indian mobile number.')
+            
+        return clean_number
 
 class ChatRequest(BaseModel):
     message: str

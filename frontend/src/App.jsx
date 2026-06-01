@@ -57,8 +57,27 @@ function App() {
     setFormData({ ...formData, [name]: value });
   };
 
+  // ✨ NEW: Dedicated Phone Change Handler
+  const handlePhoneChange = (e) => {
+    // Strip out any character that is not a number
+    const cleanValue = e.target.value.replace(/\D/g, '');
+    
+    // Cap the input length at exactly 10 characters
+    if (cleanValue.length <= 10) {
+      setFormData({ ...formData, phone_number: cleanValue });
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault(); 
+
+    // ✨ NEW: Phone Validation Regex Check
+    const phoneRegex = /^[6-9]\d{9}$/;
+    if (!phoneRegex.test(formData.phone_number)) {
+      setStatusMessage('Error: Please enter a valid 10-digit Indian phone number starting with 6, 7, 8, or 9.');
+      return; // Halt submission completely
+    }
+
     setStatusMessage('Sending...');
 
     try {
@@ -147,7 +166,8 @@ function App() {
             <form className="apply-form" onSubmit={handleSubmit}>
               <input type="text" name="full_name" placeholder="Full Name" value={formData.full_name} onChange={handleInputChange} required />
               <input type="email" name="email" placeholder="Email Address" value={formData.email} onChange={handleInputChange} required />
-              <input type="tel" name="phone_number" placeholder="Phone Number (Required)" value={formData.phone_number} onChange={handleInputChange} required />
+              {/* ✨ UPDATED: Now uses handlePhoneChange */}
+              <input type="tel" name="phone_number" placeholder="Phone Number (Required)" value={formData.phone_number} onChange={handlePhoneChange} required />
               
               <select name="preferred_country" className="country-dropdown" value={formData.preferred_country} onChange={handleInputChange} required>
                 <option value="" disabled>Select Preferred Country...</option>
@@ -172,7 +192,6 @@ function App() {
           </div>
           <div className="footer-col">
             <h3>Get In Touch</h3>
-            {/* ✨ FIXED: Professional Phone and Email Icons */}
             <p><FaPhoneAlt size={16} style={{ marginRight: '10px', color: '#38bdf8', verticalAlign: 'middle' }} /> +91 98765 43210</p>
             <p><FaEnvelope size={16} style={{ marginRight: '10px', color: '#38bdf8', verticalAlign: 'middle' }} /> jobs@nextgen.com</p>
           </div>
@@ -197,7 +216,6 @@ function App() {
 
       {showScrollTop && (
         <button onClick={scrollToTop} className="scroll-to-top">
-          {/* ✨ FIXED: Professional Up Arrow Icon */}
           <FaArrowUp size={18} />
         </button>
       )}
