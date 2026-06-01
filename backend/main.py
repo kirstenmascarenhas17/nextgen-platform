@@ -1,6 +1,6 @@
 import os
 import re
-import resend                                 # ✨ FIXED: Using Resend API instead of SMTP
+import resend                                 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -138,9 +138,6 @@ def send_welcome_email(candidate_email: str, candidate_name: str):
     try:
         print(f"🔄 Sending email via Resend API to {candidate_email}...", flush=True)
         
-        # ⚠️ CRITICAL TESTING NOTE: 
-        # Until you add a custom web domain to Resend, you MUST use 'onboarding@resend.dev' as the sender.
-        # Also, during testing, Resend will ONLY let you send emails TO the exact email address you signed up to Resend with!
         r = resend.Emails.send({
             "from": "NextGen Consultancy <onboarding@resend.dev>",
             "to": [candidate_email],
@@ -150,8 +147,8 @@ def send_welcome_email(candidate_email: str, candidate_name: str):
         
         print(f"✅ API Email dispatched! Resend ID: {r['id']}", flush=True)
     except Exception as e:
-        print(f"🔥 CRITICAL API ERROR: {e}", flush=True)
-        raise e 
+        # ✨ FIXED: Moved the silent fail here where it belongs! 
+        print(f"⚠️ API Email blocked (likely due to free-tier restrictions): {e}", flush=True)
             
 # 5. The Route that saves the form data
 @app.post("/register")
@@ -169,7 +166,7 @@ async def create_candidate(request: Request, candidate: CandidateModel):
         cursor.execute(sql, values)
         db.commit()
         
-        # ✨ DEBUG MODE: Running this directly to catch any API errors
+        # This will now run, and if Resend blocks it, it just prints a warning and keeps going!
         send_welcome_email(candidate.email, candidate.full_name)
         
         return {"message": "Candidate profile successfully uploaded to the cloud!"}
@@ -240,9 +237,8 @@ async def chat_with_ai(request: Request, payload: ChatRequest):
         return {"reply": ai_reply}
         
     except Exception as e:
-        # ✨ FIXED: We removed 'raise e' so it fails silently!
-        # Render will log the error, but the candidate will still see "Success!" on the website.
-        print(f"⚠️ API Email blocked (likely due to free-tier restrictions): {e}", flush=True)
+        # ✨ FIXED: Restored the proper AI error return
+        return {"reply": f"AI connection error: {str(e)}"}
 
 # 8. The Health Check Route (Keeps BOTH the server and database awake!)
 @app.get("/health")
