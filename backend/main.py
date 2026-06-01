@@ -42,14 +42,14 @@ class ChatRequest(BaseModel):
 def get_db_connection():
     try:
         # ✨ THE IP BYPASS: Skipping Render's broken DNS entirely
-        db_host = "168.144.86.79"
+        db_host = "nextgen-db-nextgen-db.e.aivencloud.com"
         
         db_port = os.getenv("DB_PORT", "").strip()
         db_user = os.getenv("DB_USER", "").strip()
         db_password = os.getenv("DB_PASSWORD", "").strip()
         db_name = os.getenv("DB_NAME", "").strip()
 
-        print(f"Attempting to connect to hardcoded host: {db_host}")
+        print(f"Attempting to connect to secure host: {db_host}")
 
         connection = mysql.connector.connect(
             host=db_host,
@@ -57,7 +57,8 @@ def get_db_connection():
             user=db_user,
             password=db_password,
             database=db_name,
-            ssl_disabled=False  # ✨ AIVEN SECURITY OVERRIDE
+            ssl_ca="ca.pem",      # ✨ NEW: Tells Python where the certificate is
+            ssl_verify_cert=True  # ✨ NEW: Forces a secure connection
         )
         return connection
     except Error as e:
@@ -115,14 +116,13 @@ async def create_candidate(candidate: CandidateModel):
 
 # 6. The Route to load previous chat messages
 @app.get("/chat")
-async def get_chat_history(session_id: str): # ✨ Now requires a session_id
+async def get_chat_history(session_id: str): 
     try:
         conn = get_db_connection()
         if not conn:
             return {"messages": [], "error": "Database connection failed"}
             
         cursor = conn.cursor(dictionary=True)
-        # ✨ Only pull messages for this specific user
         cursor.execute(
             "SELECT sender, message AS text FROM user_chats WHERE session_id = %s ORDER BY created_at ASC",
             (session_id,)
@@ -141,7 +141,6 @@ async def chat_with_ai(request: ChatRequest):
         conn = get_db_connection()
         if conn:
             cursor = conn.cursor()
-            # ✨ Save the session_id to the database
             cursor.execute(
                 "INSERT INTO user_chats (session_id, sender, message) VALUES (%s, %s, %s)", 
                 (request.session_id, "user", request.message)
@@ -159,7 +158,6 @@ async def chat_with_ai(request: ChatRequest):
         ai_reply = response.text
         
         if conn:
-            # ✨ Save the AI's reply with the same session_id
             cursor.execute(
                 "INSERT INTO user_chats (session_id, sender, message) VALUES (%s, %s, %s)", 
                 (request.session_id, "ai", ai_reply)
