@@ -1,7 +1,6 @@
 import os
 import re
-import smtplib                                  
-from email.message import EmailMessage
+import resend                                 # ✨ FIXED: Using Resend API instead of SMTP
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -108,20 +107,13 @@ try:
 except Exception as e:
     print(f"❌ Database connection error: {e}")
 
-# ✨ DEBUG MODE: The Automated Welcome Email Function
+# ✨ API UPGRADE: The Automated Welcome Email Function via Resend
 def send_welcome_email(candidate_email: str, candidate_name: str):
-    sender_email = os.getenv("EMAIL_SENDER")
-    sender_password = os.getenv("EMAIL_PASSWORD")
+    resend.api_key = os.getenv("RESEND_API_KEY")
 
-    if not sender_email or not sender_password:
-        # flush=True forces Render to print this immediately
-        print("❌ Email credentials missing in Render Environment!", flush=True) 
-        raise Exception("Missing EMAIL_SENDER or EMAIL_PASSWORD in environment variables")
-
-    msg = EmailMessage()
-    msg['Subject'] = 'Welcome to NextGen Consultancy - Global Placement'
-    msg['From'] = f"NextGen Consultancy <{sender_email}>"
-    msg['To'] = candidate_email
+    if not resend.api_key:
+        print("❌ Resend API Key missing!", flush=True) 
+        raise Exception("Missing RESEND_API_KEY in environment variables")
 
     html_content = f"""
     <html>
@@ -143,20 +135,23 @@ def send_welcome_email(candidate_email: str, candidate_name: str):
     </html>
     """
     
-    msg.set_content("Welcome to NextGen Consultancy! Your profile has been registered successfully.")
-    msg.add_alternative(html_content, subtype='html')
-
     try:
-        print(f"🔄 Attempting to connect to Google SMTP for {candidate_email}...", flush=True)
-        with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
-            smtp.ehlo()          
-            smtp.starttls()      
-            smtp.login(sender_email, sender_password)
-            smtp.send_message(msg)
-        print(f"✅ Welcome email successfully dispatched!", flush=True)
+        print(f"🔄 Sending email via Resend API to {candidate_email}...", flush=True)
+        
+        # ⚠️ CRITICAL TESTING NOTE: 
+        # Until you add a custom web domain to Resend, you MUST use 'onboarding@resend.dev' as the sender.
+        # Also, during testing, Resend will ONLY let you send emails TO the exact email address you signed up to Resend with!
+        r = resend.Emails.send({
+            "from": "NextGen Consultancy <onboarding@resend.dev>",
+            "to": [candidate_email],
+            "subject": "Welcome to NextGen Consultancy - Global Placement",
+            "html": html_content
+        })
+        
+        print(f"✅ API Email dispatched! Resend ID: {r['id']}", flush=True)
     except Exception as e:
-        print(f"🔥 CRITICAL SMTP ERROR: {e}", flush=True)
-        raise e # Force the error upward so the frontend sees it!
+        print(f"🔥 CRITICAL API ERROR: {e}", flush=True)
+        raise e 
             
 # 5. The Route that saves the form data
 @app.post("/register")
@@ -174,13 +169,12 @@ async def create_candidate(request: Request, candidate: CandidateModel):
         cursor.execute(sql, values)
         db.commit()
         
-        # ✨ DEBUG MODE: Running this directly. If it fails, the whole route fails!
+        # ✨ DEBUG MODE: Running this directly to catch any API errors
         send_welcome_email(candidate.email, candidate.full_name)
         
         return {"message": "Candidate profile successfully uploaded to the cloud!"}
         
     except Exception as e:
-        # This catches the email error and pushes it directly to your Render logs and React frontend
         print(f"🚨 ROUTE FAILED: {str(e)}", flush=True)
         raise HTTPException(status_code=500, detail=f"Server Error: {str(e)}")
     finally:
