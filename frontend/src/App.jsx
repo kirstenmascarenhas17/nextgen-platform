@@ -3,8 +3,7 @@ import logoImg from './assets/logo.jpg'
 import './App.css'
 import AiChatWidget from './components/AiChatWidget';
 
-// ✨ FIXED: Added Phone, Envelope, and ArrowUp icons
-import { FaFacebook, FaInstagram, FaLinkedin, FaWhatsapp, FaPhoneAlt, FaEnvelope, FaArrowUp } from 'react-icons/fa';
+import { FaFacebook, FaInstagram, FaLinkedin, FaWhatsapp, FaPhoneAlt, FaEnvelope, FaArrowUp, FaMapMarkerAlt } from 'react-icons/fa';
 import { IoCheckmarkCircle } from 'react-icons/io5';
 
 const COUNTRY_INFO = [
@@ -57,12 +56,8 @@ function App() {
     setFormData({ ...formData, [name]: value });
   };
 
-  // ✨ NEW: Dedicated Phone Change Handler
   const handlePhoneChange = (e) => {
-    // Strip out any character that is not a number
     const cleanValue = e.target.value.replace(/\D/g, '');
-    
-    // Cap the input length at exactly 10 characters
     if (cleanValue.length <= 10) {
       setFormData({ ...formData, phone_number: cleanValue });
     }
@@ -71,11 +66,10 @@ function App() {
   const handleSubmit = async (e) => {
     e.preventDefault(); 
 
-    // ✨ NEW: Phone Validation Regex Check
     const phoneRegex = /^[6-9]\d{9}$/;
     if (!phoneRegex.test(formData.phone_number)) {
       setStatusMessage('Error: Please enter a valid 10-digit Indian phone number starting with 6, 7, 8, or 9.');
-      return; // Halt submission completely
+      return; 
     }
 
     setStatusMessage('Sending...');
@@ -146,31 +140,38 @@ function App() {
           
           <div className="hero-text" id="about">
             <h2>Your Global Career Starts Here.</h2>
-            <p>We connect skilled professionals with verified employers across the globe. Register your profile today, and our placement team will match you with the perfect opportunity.</p>
+            <p>Over a Decade of Global Connections. NextGen Consultancy connects Indian talent with premium international employers. Register your profile today, and our placement team will match you with the perfect opportunity.</p>
           </div>
 
           <div className="trust-ribbon" id="services">
-            <p>Trusted placement network across:</p>
-            <div className="trust-badges">
-              <span><IoCheckmarkCircle className="check-icon" /> UAE</span>
-              <span><IoCheckmarkCircle className="check-icon" /> Singapore</span>
+            <p>Specialized Placement Pathways For:</p>
+            <div className="trust-badges" style={{ flexWrap: 'wrap', gap: '15px' }}>
+              <span><IoCheckmarkCircle className="check-icon" /> Israel</span>
+              <span><IoCheckmarkCircle className="check-icon" /> Portugal</span>
               <span><IoCheckmarkCircle className="check-icon" /> Malta</span>
-              <span><IoCheckmarkCircle className="check-icon" /> Europe</span>
+              <span><IoCheckmarkCircle className="check-icon" /> Greece</span>
+              <span><IoCheckmarkCircle className="check-icon" /> Austria</span>
+              <span><IoCheckmarkCircle className="check-icon" /> UAE</span>
             </div>
           </div>
 
           <div className="registration-section central-form" id="register">
             <h2>Candidate Registration</h2>
             <p>Secure your spot in our global database.</p>
+            <p style={{ fontSize: '13px', color: '#666', marginBottom: '15px' }}>
+              *Age limits strictly apply (typically 21–48 depending on region). Candidates must possess basic English proficiency and verifiable domain experience.
+            </p>
             
             <form className="apply-form" onSubmit={handleSubmit}>
               <input type="text" name="full_name" placeholder="Full Name" value={formData.full_name} onChange={handleInputChange} required />
               <input type="email" name="email" placeholder="Email Address" value={formData.email} onChange={handleInputChange} required />
-              {/* ✨ UPDATED: Now uses handlePhoneChange */}
+              
               <input type="tel" name="phone_number" placeholder="Phone Number (Required)" value={formData.phone_number} onChange={handlePhoneChange} required />
               
               <select name="preferred_country" className="country-dropdown" value={formData.preferred_country} onChange={handleInputChange} required>
                 <option value="" disabled>Select Preferred Country...</option>
+                <option value="Israel">Israel</option>
+                <option value="Europe">Europe (Portugal, Greece, Austria, etc.)</option>
                 <option value="UAE">United Arab Emirates (UAE)</option>
                 <option value="Singapore">Singapore</option>
                 <option value="Malta">Malta</option>
@@ -188,19 +189,44 @@ function App() {
         <div className="footer-grid">
           <div className="footer-col">
             <h3>NextGen Consultancy</h3>
-            <p>Adding Value to Lives!</p>
+            <p>Your Gateway to Global Careers.</p>
+            <p style={{ fontSize: '14px', marginTop: '10px' }}>Overseas Recruitment | Visa Documentation Support | Skills Verification | Pre-Interview Mock Training</p>
           </div>
-          <div className="footer-col">
+          <div className="footer-col" style={{ paddingRight: '20px' }}>
             <h3>Get In Touch</h3>
-            <p><FaPhoneAlt size={16} style={{ marginRight: '10px', color: '#38bdf8', verticalAlign: 'middle' }} /> +91 98765 43210</p>
-            <p><FaEnvelope size={16} style={{ marginRight: '10px', color: '#38bdf8', verticalAlign: 'middle' }} /> jobs@nextgen.com</p>
+            <p style={{ fontSize: '14px', marginBottom: '15px', lineHeight: '1.4' }}>
+              <FaMapMarkerAlt size={16} style={{ marginRight: '8px', color: '#38bdf8', verticalAlign: 'top' }} /> 
+              Shop No 2, A Wing, Krishna Prestige, MIDC Road, Opp Krishna Garden, Mira Road East, Thane 401107
+            </p>
+            <p style={{ fontSize: '14px', marginBottom: '10px' }}>
+              <FaPhoneAlt size={14} style={{ marginRight: '8px', color: '#38bdf8' }} /> +91 9076012125 / +91 9076011175
+            </p>
+            <p style={{ fontSize: '14px', marginBottom: '15px' }}>
+              <FaPhoneAlt size={14} style={{ marginRight: '8px', color: '#38bdf8' }} /> +91 9076011499 / +91 9076011522
+            </p>
+            <p style={{ fontSize: '14px' }}>
+              <a href="mailto:Careers@nextgen-consultancy.net" style={{ color: 'inherit', textDecoration: 'none' }}>
+                <FaEnvelope size={14} style={{ marginRight: '8px', color: '#38bdf8' }} /> Careers@nextgen-consultancy.net
+              </a>
+            </p>
+            <p style={{ fontSize: '14px', marginTop: '5px' }}>
+              <a href="mailto:info.nextgenconsultancy1@gmail.com" style={{ color: 'inherit', textDecoration: 'none' }}>
+                <FaEnvelope size={14} style={{ marginRight: '8px', color: '#38bdf8' }} /> info.nextgenconsultancy1@gmail.com
+              </a>
+            </p>
           </div>
           <div className="footer-col">
             <h3>Follow Us</h3>
             <div className="social-links">
-              <a href="#"><FaFacebook size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} /> Facebook</a>
-              <a href="#"><FaInstagram size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} /> Instagram</a>
-              <a href="#"><FaLinkedin size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} /> LinkedIn</a>
+              <a href="https://www.facebook.com/share/14aEPTxdTQg/" target="_blank" rel="noopener noreferrer">
+                <FaFacebook size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} /> Facebook
+              </a>
+              <a href="https://www.instagram.com/info.nextgen?igsh=MWs3aGF1NjZhdGJ6aw==" target="_blank" rel="noopener noreferrer">
+                <FaInstagram size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} /> Instagram
+              </a>
+              <a href="https://www.linkedin.com/in/nextgen-consultancy-430269397" target="_blank" rel="noopener noreferrer">
+                <FaLinkedin size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} /> LinkedIn
+              </a>
             </div>
           </div>
         </div>
@@ -209,7 +235,7 @@ function App() {
         </div>
       </footer>
 
-      <a href="https://wa.me/919876543210" target="_blank" rel="noopener noreferrer" className="floating-whatsapp">
+      <a href="https://wa.me/919076011175?text=Hi!%20I%20am%20interested%20in%20global%20job%20opportunities%20with%20NextGen." target="_blank" rel="noopener noreferrer" className="floating-whatsapp">
         <FaWhatsapp size={24} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
         WhatsApp Us
       </a>

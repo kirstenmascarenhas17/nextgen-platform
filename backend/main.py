@@ -257,7 +257,12 @@ async def chat_with_ai(request: Request, payload: ChatRequest):
         return {"reply": ai_reply}
         
     except Exception as e:
-        return {"reply": f"AI connection error: {str(e)}"}
+    # If Google tells us we hit the 5-message limit, show a clean user-friendly response
+     if "429" in str(e) or "quota" in str(e).lower():
+        return {"reply": "NextGen AI is receiving a lot of queries right now! Please wait a few seconds and try sending your message again."}
+    
+     return {"reply": "Our AI assistant is temporarily offline. Please try again shortly."}
+        
 
 # 8. The Health Check Route (Keeps BOTH the server and database awake!)
 @app.get("/health")
