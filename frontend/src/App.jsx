@@ -16,11 +16,6 @@ const COUNTRY_INFO = [
     name: 'Singapore', 
     info: 'High demand for Shipyard, Maritime, and Hospitality staff.', 
     url: 'https://en.wikipedia.org/wiki/Singapore' 
-  },
-  { 
-    name: 'Malta', 
-    info: 'Fast-track visas for Healthcare and Logistics drivers.', 
-    url: 'https://en.wikipedia.org/wiki/Malta' 
   }
 ];
 
@@ -148,7 +143,6 @@ function App() {
             <div className="trust-badges" style={{ flexWrap: 'wrap', gap: '15px' }}>
               <span><IoCheckmarkCircle className="check-icon" /> Israel</span>
               <span><IoCheckmarkCircle className="check-icon" /> Portugal</span>
-              <span><IoCheckmarkCircle className="check-icon" /> Malta</span>
               <span><IoCheckmarkCircle className="check-icon" /> Greece</span>
               <span><IoCheckmarkCircle className="check-icon" /> Austria</span>
               <span><IoCheckmarkCircle className="check-icon" /> UAE</span>
@@ -174,7 +168,6 @@ function App() {
                 <option value="Europe">Europe (Portugal, Greece, Austria, etc.)</option>
                 <option value="UAE">United Arab Emirates (UAE)</option>
                 <option value="Singapore">Singapore</option>
-                <option value="Malta">Malta</option>
                 <option value="Any">Open to Any Location</option>
               </select>
 
@@ -186,51 +179,86 @@ function App() {
       </main>
 
       <footer className="premium-footer" id="contact">
-        <div className="footer-grid">
+        <div 
+          className="footer-grid" 
+          style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', 
+            gap: '30px', 
+            alignItems: 'start' 
+          }}
+        >
+          
+          {/* Column 1: Brand Info */}
           <div className="footer-col">
             <h3>NextGen Consultancy</h3>
             <p>Your Gateway to Global Careers.</p>
             <p style={{ fontSize: '14px', marginTop: '10px' }}>Overseas Recruitment | Visa Documentation Support | Skills Verification | Pre-Interview Mock Training</p>
           </div>
-          <div className="footer-col" style={{ paddingRight: '20px' }}>
-            <h3>Get In Touch</h3>
-            <p style={{ fontSize: '14px', marginBottom: '15px', lineHeight: '1.4' }}>
-              <FaMapMarkerAlt size={16} style={{ marginRight: '8px', color: '#38bdf8', verticalAlign: 'top' }} /> 
-              Shop No 2, A Wing, Krishna Prestige, MIDC Road, Opp Krishna Garden, Mira Road East, Thane 401107
+
+          {/* Column 2: Offices (Combined) */}
+          <div className="footer-col">
+            <h3>Our Offices</h3>
+            
+            <h4 style={{ fontSize: '14px', marginBottom: '5px', color: '#38bdf8', fontWeight: 'bold' }}>Head Office</h4>
+            <p style={{ fontSize: '14px', marginBottom: '15px', lineHeight: '1.6' }}>
+              <FaMapMarkerAlt size={14} style={{ marginRight: '8px', color: '#38bdf8', verticalAlign: 'top', marginTop: '3px' }} /> 
+              <span style={{ display: 'inline-block', width: '85%' }}>
+                21/165, Jyoti Cottage, Old Anand Nagar Lane, Behind Vakola Police Station, Above Dyandeep Bank, Santacruz East, Mumbai - 400055
+              </span>
             </p>
-            <p style={{ fontSize: '14px', marginBottom: '10px' }}>
-              <FaPhoneAlt size={14} style={{ marginRight: '8px', color: '#38bdf8' }} /> +91 9076012125 / +91 9076011175
-            </p>
-            <p style={{ fontSize: '14px', marginBottom: '15px' }}>
-              <FaPhoneAlt size={14} style={{ marginRight: '8px', color: '#38bdf8' }} /> +91 9076011499 / +91 9076011522
-            </p>
-            <p style={{ fontSize: '14px' }}>
-              <a href="mailto:Careers@nextgen-consultancy.net" style={{ color: 'inherit', textDecoration: 'none' }}>
-                <FaEnvelope size={14} style={{ marginRight: '8px', color: '#38bdf8' }} /> Careers@nextgen-consultancy.net
-              </a>
-            </p>
-            <p style={{ fontSize: '14px', marginTop: '5px' }}>
-              <a href="mailto:info.nextgenconsultancy1@gmail.com" style={{ color: 'inherit', textDecoration: 'none' }}>
-                <FaEnvelope size={14} style={{ marginRight: '8px', color: '#38bdf8' }} /> info.nextgenconsultancy1@gmail.com
-              </a>
+
+            <h4 style={{ fontSize: '14px', marginBottom: '5px', color: '#38bdf8', fontWeight: 'bold' }}>Branch Office</h4>
+            <p style={{ fontSize: '14px', marginBottom: '15px', lineHeight: '1.6' }}>
+              <FaMapMarkerAlt size={14} style={{ marginRight: '8px', color: '#38bdf8', verticalAlign: 'top', marginTop: '3px' }} /> 
+              <span style={{ display: 'inline-block', width: '85%' }}>
+                Shop No 2, A Wing, Krishna Prestige, MIDC Road, Opp Krishna Garden, Mira Road East, Thane - 401107
+              </span>
             </p>
           </div>
+
+          {/* Column 3: Contact Info */}
+          <div className="footer-col">
+            <h3>Contact Us</h3>
+            <div style={{ marginBottom: '15px' }}>
+              <p style={{ fontSize: '14px', marginBottom: '12px' }}>
+                <FaPhoneAlt size={12} style={{ marginRight: '8px', color: '#38bdf8' }} /> +91 9076011522 / +91 9076011499
+              </p>
+              <p style={{ fontSize: '14px', marginBottom: '12px' }}>
+                <FaPhoneAlt size={12} style={{ marginRight: '8px', color: '#38bdf8' }} /> +91 9076012125 / +91 9076011175
+              </p>
+              <p style={{ fontSize: '14px', marginBottom: '12px' }}>
+                <a href="mailto:careers@nextgen-consultancy.net" style={{ color: 'inherit', textDecoration: 'none' }}>
+                  <FaEnvelope size={12} style={{ marginRight: '8px', color: '#38bdf8' }} /> careers@nextgen-consultancy.net
+                </a>
+              </p>
+              <p style={{ fontSize: '14px' }}>
+                <a href="mailto:info.nextgenconsultancy1@gmail.com" style={{ color: 'inherit', textDecoration: 'none' }}>
+                  <FaEnvelope size={12} style={{ marginRight: '8px', color: '#38bdf8' }} /> info.nextgenconsultancy1@gmail.com
+                </a>
+              </p>
+            </div>
+          </div>
+
+          {/* Column 4: Social Links */}
           <div className="footer-col">
             <h3>Follow Us</h3>
-            <div className="social-links">
-              <a href="https://www.facebook.com/share/14aEPTxdTQg/" target="_blank" rel="noopener noreferrer">
-                <FaFacebook size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} /> Facebook
+            {/* Stacked vertically with text */}
+            <div className="social-links" style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '10px' }}>
+              <a href="https://www.facebook.com/share/14aEPTxdTQg/" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', fontSize: '15px' }}>
+                <FaFacebook size={20} style={{ marginRight: '10px' }} /> Facebook
               </a>
-              <a href="https://www.instagram.com/info.nextgen?igsh=MWs3aGF1NjZhdGJ6aw==" target="_blank" rel="noopener noreferrer">
-                <FaInstagram size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} /> Instagram
+              <a href="https://www.instagram.com/info.nextgen?igsh=MWs3aGF1NjZhdGJ6aw==" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', fontSize: '15px' }}>
+                <FaInstagram size={20} style={{ marginRight: '10px' }} /> Instagram
               </a>
-              <a href="https://www.linkedin.com/in/nextgen-consultancy-430269397" target="_blank" rel="noopener noreferrer">
-                <FaLinkedin size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} /> LinkedIn
+              <a href="https://www.linkedin.com/in/nextgen-consultancy-430269397" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', fontSize: '15px' }}>
+                <FaLinkedin size={20} style={{ marginRight: '10px' }} /> LinkedIn
               </a>
             </div>
           </div>
+
         </div>
-        <div className="footer-bottom">
+        <div className="footer-bottom" style={{ marginTop: '30px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
           <p>&copy; 2026 NextGen Consultancy. All rights reserved.</p>
         </div>
       </footer>
