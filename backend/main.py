@@ -201,11 +201,12 @@ async def get_chat_history(request: Request, session_id: str):
     except Exception as e:
         return {"messages": [], "error": str(e)}
 
-# 7. The Route that handles new chat messages
+# 7. The Route that handles new chat messages (Upgraded with Knowledge Injection)
 @app.post("/chat")
 @limiter.limit("10/minute") 
 async def chat_with_ai(request: Request, payload: ChatRequest):
     try:
+        # 1. Save the user's message to MySQL
         conn = get_db_connection()
         if conn:
             cursor = conn.cursor()
@@ -215,16 +216,35 @@ async def chat_with_ai(request: Request, payload: ChatRequest):
             )
             conn.commit()
 
-        system_prompt = """
-        You are an expert Career Placement Advisor for NextGen Consultancy. 
-        Your job is to recommend the best country (UAE, Singapore, or Malta) based on the candidate's skills.
-        Keep your answers short, friendly, and professional (under 3 sentences).
-        Candidate message: 
+        # 2. Load the NextGen Knowledge Base
+        try:
+            with open("knowledge_base.txt", "r") as file:
+                company_knowledge = file.read()
+        except FileNotFoundError:
+            company_knowledge = "NextGen Consultancy is a global placement agency. (Knowledge base file missing)."
+
+        # 3. The Master System Prompt
+        system_prompt = f"""
+        You are an expert Career Placement Advisor for NextGen Consultancy.
+        Your goal is to be helpful, professional, and guide candidates toward registering with us.
+
+        CRITICAL RULES:
+        1. Base all your answers ONLY on the 'Company Knowledge' provided below. 
+        2. If a candidate asks about salaries, fees, processing timelines, or specific open jobs today, YOU MUST NOT make up numbers. Tell them politely that those details vary and they will be discussed personally with a placement officer once they register.
+        3. Keep your answers short, friendly, and under 4 sentences.
+
+        --- COMPANY KNOWLEDGE ---
+        {company_knowledge}
+        -------------------------
+        
+        Candidate message: {payload.message}
         """
         
-        response = ai_model.generate_content(system_prompt + payload.message)
+        # 4. Generate the AI Response
+        response = ai_model.generate_content(system_prompt)
         ai_reply = response.text
         
+        # 5. Save the AI's reply to MySQL
         if conn:
             cursor.execute(
                 "INSERT INTO user_chats (session_id, sender, message) VALUES (%s, %s, %s)", 
@@ -237,7 +257,6 @@ async def chat_with_ai(request: Request, payload: ChatRequest):
         return {"reply": ai_reply}
         
     except Exception as e:
-        # ✨ FIXED: Restored the proper AI error return
         return {"reply": f"AI connection error: {str(e)}"}
 
 # 8. The Health Check Route (Keeps BOTH the server and database awake!)
