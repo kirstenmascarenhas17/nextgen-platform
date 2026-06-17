@@ -139,7 +139,8 @@ def send_welcome_email(candidate_email: str, candidate_name: str):
         print(f"🔄 Sending email via Resend API to {candidate_email}...", flush=True)
         
         r = resend.Emails.send({
-            "from": "NextGen Consultancy <onboarding@resend.dev>",
+            # ✨ UPDATED: Sending from the official NextGen Domain
+            "from": "NextGen Careers <careers@nextgen-consultancy.net>",
             "to": [candidate_email],
             "subject": "Welcome to NextGen Consultancy - Global Placement",
             "html": html_content
@@ -147,7 +148,6 @@ def send_welcome_email(candidate_email: str, candidate_name: str):
         
         print(f"✅ API Email dispatched! Resend ID: {r['id']}", flush=True)
     except Exception as e:
-        # ✨ FIXED: Moved the silent fail here where it belongs! 
         print(f"⚠️ API Email blocked (likely due to free-tier restrictions): {e}", flush=True)
             
 # 5. The Route that saves the form data
