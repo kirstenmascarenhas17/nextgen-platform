@@ -11,23 +11,29 @@
 }
 
 * {
-  box-sizing: border-box; /* Crucial for responsive design */
+  box-sizing: border-box;
 }
 
 body {
-  /* Upgraded to the premium Inter font */
   font-family: 'Inter', sans-serif;
-  background-color: #f8fafc; /* Slightly softer premium off-white */
-  color: #0f172a; /* Slate black, easier on the eyes */
+  background-color: #f8fafc;
+  color: #0f172a;
   line-height: 1.6;
 }
 
 /* =========================================
    2. LOGO HEADER
    ========================================= */
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px); 
+}
+
 .navbar {
-  background-color: white;
-  padding: 1.5rem 2rem;
+  padding: 1rem 2rem;
   border-bottom: 1px solid #eee;
   display: flex;
   justify-content: space-between;
@@ -41,11 +47,10 @@ body {
 }
 
 .main-logo {
-  width: 120px;
-  height: 120px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #eee;
 }
 
 .logo-text {
@@ -54,292 +59,10 @@ body {
 }
 
 .company-name {
-  font-size: 1.8rem;
+  font-size: 1.4rem;
   font-weight: 800;
   color: #1a1a2b;
   line-height: 1.2;
-}
-
-.brand-tagline {
-  font-size: 1rem;
-  color: #03a9f4;
-  font-weight: 500;
-}
-
-.contact-header {
-  font-size: 0.95rem;
-  color: #555;
-  text-align: right;
-  font-weight: 500;
-}
-
-/* =========================================
-   3. MAIN LAYOUT
-   ========================================= */
-.main-layout {
-  display: flex;
-  min-height: calc(100vh - 150px);
-  width: 100%;
-}
-
-/* =========================================
-   4. SIDEBAR (Links Area)
-   ========================================= */
-.sidebar {
-  width: 320px;
-  background-color: #ffffff; /* Cleaner look */
-  padding: 2.5rem 2rem;
-  border-right: 1px solid #e0e0e8;
-  box-shadow: 2px 0 10px rgba(0,0,0,0.02); /* Soft depth */
-}
-
-.sidebar h2 {
-  font-size: 1.4rem;
-  color: #1a1a2b;
-  margin-bottom: 5px;
-  font-weight: 700;
-}
-
-.sidebar-subtitle {
-  font-size: 0.85rem;
-  color: #666;
-  margin-bottom: 25px;
-  line-height: 1.4;
-}
-
-.country-link-list {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.country-info-card {
-  display: block;
-  background-color: white;
-  border: 1px solid #e0e0e8;
-  padding: 15px;
-  border-radius: 8px;
-  text-decoration: none;
-  color: inherit;
-  transition: all 0.3s ease; /* Smoother transition */
-}
-
-.country-info-card:hover {
-  border-color: #03a9f4;
-  box-shadow: 0 4px 12px rgba(3, 169, 244, 0.15);
-  transform: translateY(-3px); /* Premium lift effect */
-}
-
-.country-info-card h3 {
-  color: #1a1a2b;
-  font-size: 1.1rem;
-  margin-bottom: 5px;
-  display: flex;
-  justify-content: space-between;
-  font-weight: 600;
-}
-
-.link-icon {
-  color: #03a9f4;
-  font-size: 1.2rem;
-}
-
-.country-info-card p {
-  font-size: 0.9rem;
-  color: #555;
-  line-height: 1.4;
-}
-
-/* =========================================
-   5. MAIN CONTENT AREA (Home Page Layout)
-   ========================================= */
-.content-area {
-  flex: 1;
-  padding: 3rem 4rem;
-  width: 100%; /* Ensures it doesn't overflow */
-}
-
-.home-page-layout {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.hero-text {
-  max-width: 700px;
-  margin-bottom: 40px;
-}
-
-.hero-text h2 {
-  font-size: 2.2rem;
-  color: #1a1a2b;
-  margin-bottom: 15px;
-  font-weight: 800;
-  letter-spacing: -0.5px; /* Modern tight spacing for headings */
-}
-
-.hero-text p {
-  font-size: 1.1rem;
-  color: #444;
-  line-height: 1.6;
-}
-
-/* =========================================
-   6. REGISTRATION FORM
-   ========================================= */
-.registration-section {
-  background: white;
-  padding: 40px; /* Slightly more breathing room */
-  border-radius: 12px;
-  border: 1px solid #eee;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.04); /* Deeper premium shadow */
-  width: 100%;
-  max-width: 500px; /* Limits width on big screens */
-}
-
-.central-form {
-  width: 100%;
-  text-align: left;
-}
-
-.central-form h2 {
-  color: #1a1a2b;
-  margin-bottom: 5px;
-  font-weight: 700;
-}
-
-.central-form p {
-  margin-bottom: 25px;
-  color: #555;
-}
-
-.apply-form {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.apply-form input, .country-dropdown {
-  padding: 14px; /* Taller inputs feel more premium */
-  border: 1px solid #ddd;
-  border-radius: 8px; /* Softer corners */
-  font-size: 1rem;
-  background-color: #f8fafc; /* Subtle fill */
-  color: #333;
-  font-family: inherit;
-  transition: all 0.2s ease;
-  width: 100%; /* Forces inputs to stay inside container */
-}
-
-.apply-form input:focus, .country-dropdown:focus {
-  outline: none;
-  background-color: white;
-  border-color: #03a9f4;
-  box-shadow: 0 0 0 4px rgba(3, 169, 244, 0.1);
-}
-
-.country-dropdown {
-  cursor: pointer;
-}
-
-.apply-form button {
-  background-color: #03a9f4;
-  color: white;
-  padding: 16px;
-  border: none;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  margin-top: 10px;
-  width: 100%;
-}
-
-.apply-form button:hover {
-  background-color: #0288d1;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(3, 169, 244, 0.3);
-}
-
-/* =========================================
-   7. 📱 MOBILE RESPONSIVENESS (THE MAGIC FIX)
-   ========================================= */
-@media screen and (max-width: 900px) {
-  
-  /* Stack the Sidebar and Main Content vertically */
-  .main-layout {
-    flex-direction: column;
-  }
-
-  /* Make the Sidebar take up the full screen width */
-  .sidebar {
-    width: 100%;
-    border-right: none;
-    border-bottom: 1px solid #e0e0e8;
-    padding: 2rem 1.5rem;
-  }
-
-  /* Reduce massive padding on phone screens */
-  .content-area {
-    padding: 2rem 1.5rem;
-  }
-
-  /* Adjust the Header for smaller screens */
-  .navbar {
-    flex-direction: column;
-    text-align: center;
-    gap: 15px;
-    padding: 1.5rem;
-  }
-
-  .logo-section {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .main-logo {
-    width: 90px; /* Shrink logo slightly */
-    height: 90px;
-  }
-
-  .contact-header {
-    text-align: center;
-  }
-
-  /* Make typography smaller for phones */
-  .hero-text h2 {
-    font-size: 1.8rem;
-  }
-  
-  .company-name {
-    font-size: 1.5rem;
-  }
-
-  /* Make sure the form fits on the screen */
-  .registration-section {
-    padding: 25px 20px;
-  }
-}
-
-/* =========================================
-   8. NEW UI/UX SPRINT STYLES
-   ========================================= */
-
-/* Sticky Frosted Header */
-.sticky-header {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  background-color: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px); /* The frosted glass effect */
-  padding: 1rem 2rem; /* Slimmer than before */
-}
-
-.main-logo {
-  width: 50px; /* Slimmer logo for the sticky header */
-  height: 50px;
 }
 
 .desktop-nav {
@@ -354,6 +77,7 @@ body {
   font-weight: 500;
   font-size: 0.95rem;
   transition: color 0.2s ease;
+  cursor: pointer;
 }
 
 .desktop-nav a:hover {
@@ -374,14 +98,85 @@ body {
   box-shadow: 0 4px 12px rgba(3, 169, 244, 0.3);
 }
 
+/* =========================================
+   3. MAIN LAYOUT
+   ========================================= */
+.main-layout {
+  display: block;
+  min-height: calc(100vh - 150px);
+  width: 100%;
+}
+
+.home-page-layout {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* =========================================
+   4. ✨ NEW: HOME HERO BACKGROUND
+   ========================================= */
+.home-hero-section {
+  position: relative;
+  width: 100%;
+  padding: 140px 20px 160px 20px; /* Extra bottom padding for overlap effect */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Beautiful Earth from space background */
+  background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=2000'); 
+  background-size: cover;
+  background-position: center;
+}
+
+.home-hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.75); /* Dark overlay to make white text pop */
+  z-index: 1;
+}
+
+.home-hero-section .hero-text {
+  position: relative;
+  z-index: 2;
+  color: white;
+  text-align: center;
+  max-width: 800px;
+  margin-bottom: 0;
+}
+
+.home-hero-section .hero-text h2 {
+  color: white;
+  text-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  font-size: 3rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 15px;
+}
+
+.home-hero-section .hero-text p {
+  color: #e0f2fe; /* Lightest blue-white */
+  font-size: 1.2rem;
+  line-height: 1.6;
+}
+
 /* Trust Ribbon */
 .trust-ribbon {
-  background-color: #f1f5f9;
+  background-color: white; /* Changed from grey so it pops against the dark hero */
   width: 100%;
   padding: 25px;
   border-radius: 8px;
   margin-bottom: 40px;
   border: 1px solid #e2e8f0;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1); /* Adds shadow since it overlaps the hero now */
 }
 
 .trust-ribbon p {
@@ -404,13 +199,345 @@ body {
 }
 
 .check-icon {
-  color: #03a9f4; /* Brand blue checkmarks */
+  color: #03a9f4;
   vertical-align: middle;
   margin-right: 5px;
   font-size: 1.3rem;
 }
 
-/* Premium Footer */
+/* =========================================
+   5. HORIZONTAL CAROUSEL
+   ========================================= */
+.services-section {
+  margin: 60px 0;
+  text-align: center;
+  width: 100%;
+  overflow: hidden;
+}
+
+.services-section h2 {
+  font-size: 2.5rem;
+  color: #1e293b;
+  margin-bottom: 20px;
+}
+
+.carousel-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.scroll-arrow {
+  position: absolute;
+  z-index: 10;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  color: #0ea5e9;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: all 0.2s;
+}
+
+.scroll-arrow:hover {
+  background: #0ea5e9;
+  color: white;
+  border-color: #0ea5e9;
+}
+
+.scroll-arrow.left { left: 0px; }
+.scroll-arrow.right { right: 0px; }
+
+.services-grid {
+  display: flex;
+  overflow-x: auto;
+  gap: 20px;
+  padding: 10px 50px 30px 50px; 
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; 
+  -ms-overflow-style: none; 
+}
+.services-grid::-webkit-scrollbar {
+  display: none; 
+}
+
+.service-card {
+  flex: 0 0 280px; 
+  scroll-snap-align: start;
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  cursor: pointer;
+  height: 350px;
+  display: flex;
+  align-items: flex-end;
+}
+
+.service-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+}
+
+.service-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+  transition: transform 0.7s ease; 
+}
+
+.service-card:hover .service-image {
+  transform: scale(1.1);
+}
+
+.service-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+  z-index: 2;
+}
+
+.service-title {
+  position: relative;
+  z-index: 3;
+  color: white;
+  font-size: 1.4rem;
+  font-weight: bold;
+  padding: 20px;
+  width: 100%;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* =========================================
+   6. REGISTRATION FORM
+   ========================================= */
+.registration-section {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  border: 1px solid #eee;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+  width: 100%;
+  max-width: 500px;
+  text-align: left;
+}
+
+.registration-section h2 {
+  color: #1a1a2b;
+  margin-bottom: 5px;
+  font-weight: 700;
+}
+
+.registration-section p {
+  margin-bottom: 25px;
+  color: #555;
+}
+
+.apply-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.apply-form input, .country-dropdown {
+  padding: 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: #f8fafc;
+  color: #333;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.apply-form input:focus, .country-dropdown:focus {
+  outline: none;
+  background-color: white;
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
+}
+
+.country-dropdown {
+  cursor: pointer;
+}
+
+.apply-form button {
+  background-color: #0ea5e9;
+  color: white;
+  padding: 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+  width: 100%;
+}
+
+.apply-form button:hover {
+  background-color: #0288d1;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+}
+
+/* =========================================
+   7. SEPARATE SERVICES PAGE VIEW
+   ========================================= */
+.services-page-layout {
+  display: flex;
+  width: 100%;
+  max-width: 1200px;
+  margin: 60px auto; 
+  gap: 40px;
+  padding: 0 20px;
+  min-height: 60vh;
+  align-items: flex-start; 
+}
+
+.services-sidebar {
+  width: 320px;
+  flex-shrink: 0;
+  background-color: #e0f2fe; 
+  border-radius: 12px;
+  padding: 30px 20px;
+  border: 1px solid #bae6fd;
+  position: sticky; 
+  top: 100px; 
+  height: fit-content;
+  max-height: calc(100vh - 120px); 
+  overflow-y: auto; 
+}
+
+.sidebar-header {
+  color: #0c4a6e; 
+  font-size: 1.3rem;
+  font-weight: 800;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+  border-bottom: 2px solid #7dd3fc;
+  padding-bottom: 15px;
+}
+
+.sidebar-links-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sidebar-tab {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 12px 10px;
+  text-align: left;
+  background: transparent !important; 
+  color: #0c4a6e !important; 
+  border: none;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  gap: 12px;
+}
+
+.sidebar-icon {
+  font-size: 1.1rem;
+  color: #0c4a6e;
+}
+
+.sidebar-tab:hover {
+  color: #0ea5e9 !important; 
+  transform: translateX(5px);
+}
+.sidebar-tab:hover .sidebar-icon {
+  color: #0ea5e9;
+}
+
+.services-main-content {
+  flex-grow: 1;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  gap: 60px; 
+}
+
+.service-detail-block {
+  background: white;
+  padding: 40px;
+  border-radius: 16px;
+  border: 1px solid #eee;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+  scroll-margin-top: 100px; 
+}
+
+.service-header-row {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.header-icon {
+  font-size: 2rem;
+  color: #0ea5e9;
+}
+
+.service-detail-block h2 {
+  color: #0c4a6e;
+  font-size: 2.5rem;
+  margin: 0;
+  text-transform: uppercase;
+  font-weight: 800;
+}
+
+.service-detail-block img {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.service-detail-block p {
+  font-size: 1.1rem;
+  line-height: 1.9;
+  color: #475569;
+  margin: 0;
+}
+
+.detail-divider {
+  height: 2px;
+  background: linear-gradient(to right, transparent, #0ea5e9, transparent);
+  width: 80%;
+  margin: 40px auto 0 auto;
+}
+
+/* =========================================
+   8. FOOTER & ACTIONS
+   ========================================= */
 .premium-footer {
   background-color: #0f172a;
   color: #f8fafc;
@@ -419,11 +546,6 @@ body {
 }
 
 .footer-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 40px;
-  max-width: 1200px;
-  margin: 0 auto;
   border-bottom: 1px solid #334155;
   padding-bottom: 40px;
 }
@@ -437,18 +559,7 @@ body {
 .footer-col p {
   color: #cbd5e1;
   margin-bottom: 8px;
-}
-
-.social-links {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.social-links a {
-  color: #cbd5e1;
-  text-decoration: none;
-  transition: color 0.2s;
+  font-size: 0.95rem;
 }
 
 .social-links a:hover {
@@ -462,11 +573,10 @@ body {
   font-size: 0.9rem;
 }
 
-/* Floating Actions */
 .floating-whatsapp {
   position: fixed;
   bottom: 25px;
-  left: 25px; /* Placed on the left so it doesn't block your AI chat on the right */
+  left: 25px;
   background-color: #25D366;
   color: white;
   padding: 12px 20px;
@@ -484,7 +594,7 @@ body {
 
 .scroll-to-top {
   position: fixed;
-  bottom: 95px; /* Sits right above your AI chat widget */
+  bottom: 95px; 
   right: 25px;
   background-color: #1e293b;
   color: white;
@@ -500,30 +610,241 @@ body {
 }
 
 .scroll-to-top:hover {
-  background-color: #38bdf8;
+  background-color: #0ea5e9;
 }
 
 .status-msg {
   margin-top: 15px;
   color: #0ea5e9;
   font-weight: 600;
+  text-align: center;
 }
 
-/* Mobile Fixes for New Elements */
+/* =========================================
+   10. ✨ ABOUT US PAGE VIEW (LIGHT BLUE BACKGROUND)
+   ========================================= */
+.about-page-layout {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 60px;
+  background-color: #f0f9ff; /* ✨ VERY LIGHT BLUE */
+}
+
+.about-hero {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.about-hero-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+
+.about-hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.65); 
+  z-index: 2;
+}
+
+.about-hero-title {
+  position: relative;
+  z-index: 3;
+  color: white;
+  font-size: 3.5rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+.about-content {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 60px 40px;
+  background-color: white; /* Keeps text box readable */
+  border-radius: 12px;
+  transform: translateY(-40px); 
+  z-index: 4;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08); /* Added shadow so it pops against light blue */
+}
+
+.about-text-block {
+  margin-bottom: 40px;
+}
+
+.about-text-block:last-child {
+  margin-bottom: 0;
+}
+
+.about-text-block h2 {
+  color: #0c4a6e;
+  font-size: 2rem;
+  margin-bottom: 20px;
+  border-bottom: 3px solid #0ea5e9;
+  padding-bottom: 10px;
+  display: inline-block;
+}
+
+.about-text-block p {
+  font-size: 1.15rem;
+  line-height: 1.8;
+  color: #475569;
+}
+
+.about-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.about-list li {
+  font-size: 1.1rem;
+  color: #475569;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: flex-start;
+  line-height: 1.6;
+}
+
+.about-check {
+  color: #0ea5e9;
+  font-size: 1.5rem;
+  margin-right: 15px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* =========================================
+   11. 📱 MOBILE RESPONSIVENESS
+   ========================================= */
 @media screen and (max-width: 900px) {
+  .navbar {
+    flex-direction: column;
+    padding: 1rem;
+    gap: 10px;
+  }
+  
   .desktop-nav {
     flex-wrap: wrap;
     justify-content: center;
-    gap: 15px;
+    gap: 10px;
+    font-size: 0.85rem;
   }
+  
   .nav-register-btn {
+    padding: 8px 15px;
     width: 100%;
     text-align: center;
   }
+
+  /* ✨ Mobile Hero Fixes */
+  .home-hero-section {
+    padding: 100px 15px 120px 15px;
+  }
+
+  .home-hero-section .hero-text h2 {
+    font-size: 2rem;
+  }
+
+  .home-hero-section .hero-text p {
+    font-size: 1rem;
+  }
+
+  .home-page-layout {
+    padding: 0 1rem 2rem 1rem;
+  }
+
+  .services-page-layout {
+    flex-direction: column; 
+    margin: 40px auto;
+  }
+  
+  .services-sidebar {
+    width: 100%;
+  }
+
+  .service-detail-block {
+    padding: 20px;
+  }
+  
+  .service-detail-block h2 {
+    font-size: 1.8rem;
+  }
+  
+  .service-detail-block img {
+    height: 250px;
+  }
+  
+  .service-detail-block p {
+    font-size: 1rem;
+  }
+
+  .scroll-arrow {
+    display: none; 
+  }
+  .services-grid {
+    padding: 10px 10px 30px 10px; 
+  }
+  .service-card {
+    flex: 0 0 240px;
+    height: 300px;
+  }
+  
+  .service-title {
+    font-size: 1.2rem;
+  }
+
+  .premium-footer {
+    padding: 30px 20px;
+  }
+  
+  .footer-grid {
+    gap: 20px;
+  }
+  
   .floating-whatsapp {
-    bottom: 20px;
-    left: 20px;
+    bottom: 15px;
+    left: 15px;
     padding: 10px 15px;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
+  }
+  
+  .scroll-to-top {
+    bottom: 70px;
+    right: 15px;
+  }
+
+  /* About page mobile */
+  .about-hero {
+    height: 300px;
+  }
+  .about-hero-title {
+    font-size: 2.5rem;
+  }
+  .about-content {
+    margin: 0 15px;
+    padding: 30px 20px;
+    transform: translateY(-20px);
+  }
+  .about-text-block h2 {
+    font-size: 1.6rem;
+  }
+  .about-text-block p, .about-list li {
+    font-size: 1rem;
   }
 }
