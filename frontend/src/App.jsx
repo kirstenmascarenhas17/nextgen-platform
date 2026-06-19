@@ -75,6 +75,12 @@ function App() {
   const [currentView, setCurrentView] = useState('home'); 
   const carouselRef = useRef(null);
 
+  // ✨ NEW: Admin Dashboard States
+  const [adminPassword, setAdminPassword] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [candidatesList, setCandidatesList] = useState([]);
+  const [adminError, setAdminError] = useState('');
+
   useEffect(() => {
     const handleScroll = () => setShowScrollTop(window.scrollY > 300);
     window.addEventListener('scroll', handleScroll);
@@ -167,6 +173,25 @@ function App() {
     }, 100);
   };
 
+  // ✨ NEW: The Admin Login Handler
+  const handleAdminLogin = async (e) => {
+    e.preventDefault();
+    setAdminError('Authenticating...');
+    try {
+      const response = await fetch(`https://nextgen-api-11jg.onrender.com/admin/candidates?secret=${adminPassword}`);
+      if (response.ok) {
+        const data = await response.json();
+        setCandidatesList(data.candidates);
+        setIsAuthenticated(true);
+        setAdminError('');
+      } else {
+        setAdminError('Incorrect PIN. Access Denied.');
+      }
+    } catch (error) {
+      setAdminError('Error connecting to the secure server.');
+    }
+  };
+
   const scrollLeft = () => {
     if (carouselRef.current) carouselRef.current.scrollBy({ left: -300, behavior: 'smooth' });
   };
@@ -238,7 +263,6 @@ function App() {
            ========================================= */}
         {currentView === 'home' && (
           <>
-            {/* ✨ NEW: Full-width Earth Background Hero */}
             <section className="home-hero-section">
               <div className="home-hero-overlay"></div>
               <div className="hero-text" id="home-hero">
@@ -248,7 +272,6 @@ function App() {
             </section>
 
             <section className="content-area home-page-layout">
-              {/* Added a negative margin to pull the ribbon up over the earth image slightly for a premium feel */}
               <div className="trust-ribbon" style={{ marginBottom: '50px', marginTop: '-60px', position: 'relative', zIndex: 10 }}>
                 <p>Specialized Placement Pathways For:</p>
                 <div className="trust-badges" style={{ flexWrap: 'wrap', gap: '15px', justifyContent: 'center' }}>
@@ -308,7 +331,6 @@ function App() {
            ========================================= */}
         {currentView === 'services' && (
           <section className="services-page-layout">
-            
             <aside className="services-sidebar">
               <h2 className="sidebar-header">Job Sectors</h2>
               <div className="sidebar-links-container">
@@ -324,7 +346,6 @@ function App() {
                 ))}
               </div>
             </aside>
-            
             <div className="services-main-content">
               {SERVICES_INFO.map((service) => (
                 <div id={service.id} key={service.id} className="service-detail-block">
@@ -338,7 +359,6 @@ function App() {
                 </div>
               ))}
             </div>
-            
           </section>
         )}
 
@@ -354,7 +374,6 @@ function App() {
                 className="about-hero-image" 
               />
               <div className="about-hero-overlay"></div>
-              {/* ✨ UPDATED TITLE */}
               <h1 className="about-hero-title">About Us</h1> 
             </div>
 
@@ -363,7 +382,6 @@ function App() {
                 <h2>Our Mission</h2>
                 <p>NextGen Consultancy was founded with a singular vision: to bridge the gap between world-class international employers and the incredibly driven talent pool in India. For over a decade, we have dedicated ourselves to changing lives by providing secure, verified, and highly lucrative overseas career opportunities.</p>
               </div>
-
               <div className="about-text-block">
                 <h2>Why Choose Us?</h2>
                 <ul className="about-list">
@@ -372,7 +390,6 @@ function App() {
                   <li><IoCheckmarkDoneCircle className="about-check" /> <strong>Global Reach:</strong> Specialized pathways into Europe, Israel, UAE, and Singapore across 8+ major industrial sectors.</li>
                 </ul>
               </div>
-
               <div className="about-text-block">
                 <h2>Our Story</h2>
                 <p>What started as a small recruitment desk in Mumbai has grown into a trusted international placement agency. We have successfully placed thousands of candidates in roles ranging from heavy construction to luxury hospitality. Our success is built entirely on trust, transparency, and a relentless commitment to our candidates' futures.</p>
@@ -381,9 +398,71 @@ function App() {
           </section>
         )}
 
+        {/* =========================================
+             ✨ NEW: HIDDEN ADMIN DASHBOARD
+           ========================================= */}
+        {currentView === 'admin' && (
+          <section style={{ minHeight: '60vh', padding: '60px 20px', maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
+            <h2 style={{ textAlign: 'center', color: '#0c4a6e', marginBottom: '30px', fontSize: '2.5rem' }}>Admin Control Panel</h2>
+            
+            {!isAuthenticated ? (
+              <div style={{ maxWidth: '400px', margin: '0 auto', background: 'white', padding: '40px', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}>
+                <p style={{textAlign: 'center', marginBottom: '25px', color: '#475569'}}>Enter secure PIN to access candidate database.</p>
+                <form onSubmit={handleAdminLogin} style={{display: 'flex', flexDirection: 'column', gap: '15px'}}>
+                  <input 
+                    type="password" 
+                    placeholder="Enter Security PIN" 
+                    value={adminPassword} 
+                    onChange={(e) => setAdminPassword(e.target.value)} 
+                    style={{padding: '15px', borderRadius: '8px', border: '1px solid #ccc', fontSize: '1.1rem'}}
+                  />
+                  <button type="submit" style={{background: '#0ea5e9', color: 'white', padding: '15px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold', fontSize: '1.1rem'}}>
+                    Authenticate
+                  </button>
+                </form>
+                {adminError && <p style={{color: '#ef4444', textAlign: 'center', marginTop: '20px', fontWeight: 'bold'}}>{adminError}</p>}
+              </div>
+            ) : (
+              <div style={{ overflowX: 'auto', background: 'white', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', padding: '20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                  <h3 style={{ color: '#0ea5e9', margin: 0 }}>Total Registered Candidates: {candidatesList.length}</h3>
+                  <button onClick={() => {setIsAuthenticated(false); setAdminPassword('');}} style={{ background: '#ef4444', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '6px', cursor: 'pointer' }}>Lock Dashboard</button>
+                </div>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                  <thead>
+                    <tr style={{ background: '#f0f9ff', color: '#0c4a6e' }}>
+                      <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Name</th>
+                      <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Email</th>
+                      <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Phone</th>
+                      <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Preferred Location</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {candidatesList.length === 0 ? (
+                      <tr><td colSpan="4" style={{ padding: '30px', textAlign: 'center', color: '#64748b' }}>No candidates found in the database.</td></tr>
+                    ) : (
+                      candidatesList.map((c, index) => (
+                        <tr key={index} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                          <td style={{ padding: '15px', fontWeight: 'bold', color: '#334155' }}>{c.full_name}</td>
+                          <td style={{ padding: '15px', color: '#475569' }}>{c.email}</td>
+                          <td style={{ padding: '15px', color: '#475569' }}>{c.phone_number}</td>
+                          <td style={{ padding: '15px' }}>
+                            <span style={{ background: '#e0f2fe', color: '#0369a1', padding: '5px 10px', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold' }}>
+                              {c.preferred_country}
+                            </span>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+        )}
+
       </main>
 
-      {/* FOOTER */}
       <footer className="premium-footer" id="contact">
         <div 
           className="footer-grid" 
@@ -394,16 +473,13 @@ function App() {
             alignItems: 'start' 
           }}
         >
-          
           <div className="footer-col">
             <h3>NextGen Consultancy</h3>
             <p>Your Gateway to Global Careers.</p>
             <p style={{ fontSize: '14px', marginTop: '10px' }}>Overseas Recruitment | Visa Documentation Support | Skills Verification | Pre-Interview Mock Training</p>
           </div>
-
           <div className="footer-col">
             <h3>Our Offices</h3>
-            
             <h4 style={{ fontSize: '14px', marginBottom: '5px', color: '#38bdf8', fontWeight: 'bold' }}>Head Office</h4>
             <p style={{ fontSize: '14px', marginBottom: '15px', lineHeight: '1.6' }}>
               <FaMapMarkerAlt size={14} style={{ marginRight: '8px', color: '#38bdf8', verticalAlign: 'top', marginTop: '3px' }} /> 
@@ -411,7 +487,6 @@ function App() {
                 21/165, Jyoti Cottage, Old Anand Nagar Lane, Behind Vakola Police Station, Above Dyandeep Bank, Santacruz East, Mumbai - 400055
               </span>
             </p>
-
             <h4 style={{ fontSize: '14px', marginBottom: '5px', color: '#38bdf8', fontWeight: 'bold' }}>Branch Office</h4>
             <p style={{ fontSize: '14px', marginBottom: '15px', lineHeight: '1.6' }}>
               <FaMapMarkerAlt size={14} style={{ marginRight: '8px', color: '#38bdf8', verticalAlign: 'top', marginTop: '3px' }} /> 
@@ -420,7 +495,6 @@ function App() {
               </span>
             </p>
           </div>
-
           <div className="footer-col">
             <h3>Contact Us</h3>
             <div style={{ marginBottom: '15px' }}>
@@ -442,7 +516,6 @@ function App() {
               </p>
             </div>
           </div>
-
           <div className="footer-col">
             <h3>Follow Us</h3>
             <div className="social-links" style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '10px' }}>
@@ -457,10 +530,15 @@ function App() {
               </a>
             </div>
           </div>
-
         </div>
         <div className="footer-bottom" style={{ marginTop: '30px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-          <p>&copy; 2026 NextGen Consultancy. All rights reserved.</p>
+          {/* ✨ NEW: The Secret Admin Door (Click the copyright text!) */}
+          <p 
+            onClick={() => {setCurrentView('admin'); window.scrollTo(0,0);}} 
+            style={{ cursor: 'pointer', display: 'inline-block' }}
+          >
+            &copy; 2026 NextGen Consultancy. All rights reserved.
+          </p>
         </div>
       </footer>
 

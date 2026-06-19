@@ -1,6 +1,6 @@
 import os
 import re
-import resend                                 
+import resend
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -257,11 +257,11 @@ async def chat_with_ai(request: Request, payload: ChatRequest):
         return {"reply": ai_reply}
         
     except Exception as e:
-    # If Google tells us we hit the 5-message limit, show a clean user-friendly response
-     if "429" in str(e) or "quota" in str(e).lower():
-        return {"reply": "NextGen AI is receiving a lot of queries right now! Please wait a few seconds and try sending your message again."}
+        # If Google tells us we hit the 5-message limit, show a clean user-friendly response
+        if "429" in str(e) or "quota" in str(e).lower():
+            return {"reply": "NextGen AI is receiving a lot of queries right now! Please wait a few seconds and try sending your message again."}
     
-     return {"reply": "Our AI assistant is temporarily offline. Please try again shortly."}
+        return {"reply": "Our AI assistant is temporarily offline. Please try again shortly."}
         
 
 # 8. The Health Check Route (Keeps BOTH the server and database awake!)
@@ -279,3 +279,31 @@ async def health_check():
             return {"status": "API is awake, but Database is unreachable!"}
     except Exception as e:
         return {"status": f"API is awake, but DB threw an error: {str(e)}"}
+
+# 9. ✨ NEW: The Admin Dashboard Route
+@app.get("/admin/candidates")
+async def get_all_candidates(request: Request, secret: str = ""):
+    # Simple security lock (Change this PIN to whatever you want!)
+    if secret != "NextGenAdmin2026":
+        raise HTTPException(status_code=401, detail="Unauthorized Access")
+        
+    db = get_db_connection()
+    if not db:
+        raise HTTPException(status_code=500, detail="Database connection failed")
+        
+    try:
+        cursor = db.cursor(dictionary=True)
+        # Fetch all candidates
+        cursor.execute("SELECT * FROM candidates")
+        candidates = cursor.fetchall()
+        # Reverse the list so the newest registrations are at the top
+        candidates.reverse() 
+        return {"candidates": candidates}
+    except Exception as e:
+        print(f"🚨 ADMIN ROUTE FAILED: {str(e)}", flush=True)
+        raise HTTPException(status_code=500, detail=f"Server Error: {str(e)}")
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'db' in locals() and db.is_connected():
+            db.close()
