@@ -67,7 +67,7 @@ const SERVICES_INFO = [
 
 function App() {
   const [formData, setFormData] = useState({
-    full_name: '', email: '', phone_number: '', preferred_country: '', preferred_job: ''        
+    full_name: '', email: '', phone_number: '', preferred_country: '', preferred_job: ''
   });
   const [statusMessage, setStatusMessage] = useState('');
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -75,7 +75,6 @@ function App() {
   const [currentView, setCurrentView] = useState('home'); 
   const carouselRef = useRef(null);
 
-  // ✨ NEW: Admin Dashboard States
   const [adminPassword, setAdminPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [candidatesList, setCandidatesList] = useState([]);
@@ -107,7 +106,6 @@ function App() {
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  // Navigation Handlers
   const navigateToHome = (e) => {
     if(e) e.preventDefault();
     setCurrentView('home');
@@ -173,7 +171,6 @@ function App() {
     }, 100);
   };
 
-  // ✨ NEW: The Admin Login Handler
   const handleAdminLogin = async (e) => {
     e.preventDefault();
     setAdminError('Authenticating...');
@@ -190,6 +187,26 @@ function App() {
     } catch (error) {
       setAdminError('Error connecting to the secure server.');
     }
+  };
+
+  // ✨ NEW: Copy to Excel Function
+  const handleCopyToExcel = () => {
+    if (candidatesList.length === 0) {
+      alert("No data available to copy.");
+      return;
+    }
+
+    // Creating Tab-Separated string for perfect Excel pasting
+    let excelData = "Name\tEmail\tPhone\tTarget Job\tPreferred Location\n";
+    candidatesList.forEach(c => {
+      excelData += `${c.full_name}\t${c.email}\t${c.phone_number}\t${c.preferred_job}\t${c.preferred_country}\n`;
+    });
+
+    navigator.clipboard.writeText(excelData).then(() => {
+      alert("✅ Data copied to clipboard! Open Excel and press Ctrl+V to paste.");
+    }).catch(err => {
+      alert("Failed to copy data. Your browser might be blocking clipboard access.");
+    });
   };
 
   const scrollLeft = () => {
@@ -227,7 +244,7 @@ function App() {
       const data = await response.json();
       if (response.ok) {
         setStatusMessage('Success! Your profile has been registered.');
-        setFormData({ full_name: '', email: '', phone_number: '', preferred_country: '' });
+        setFormData({ full_name: '', email: '', phone_number: '', preferred_country: '', preferred_job: '' });
       } else {
         setStatusMessage(`Error: ${data.detail}`);
       }
@@ -258,9 +275,6 @@ function App() {
       
       <main className="main-layout">
         
-        {/* =========================================
-             HOME PAGE VIEW
-           ========================================= */}
         {currentView === 'home' && (
           <>
             <section className="home-hero-section">
@@ -285,10 +299,8 @@ function App() {
 
               <div id="services" className="services-section">
                 <h2>Our Services</h2>
-                
                 <div className="carousel-wrapper">
                   <button className="scroll-arrow left" onClick={scrollLeft}><FaChevronLeft /></button>
-                  
                   <div className="services-grid" ref={carouselRef}>
                     {SERVICES_INFO.map((service, index) => (
                       <div key={index} className="service-card" onClick={(e) => navigateToServices(service, e)}>
@@ -298,7 +310,6 @@ function App() {
                       </div>
                     ))}
                   </div>
-
                   <button className="scroll-arrow right" onClick={scrollRight}><FaChevronRight /></button>
                 </div>
               </div>
@@ -311,7 +322,6 @@ function App() {
                   <input type="email" name="email" placeholder="Email Address" value={formData.email} onChange={handleInputChange} required />
                   <input type="tel" name="phone_number" placeholder="Phone Number (Required)" value={formData.phone_number} onChange={handlePhoneChange} required />
                   
-                  {/* ✨ THIS IS THE NEW FIELD */}
                   <input type="text" name="preferred_job" placeholder="Target Job Role (e.g., Rigger, Nurse, Engineer)" value={formData.preferred_job} onChange={handleInputChange} required />
                   
                   <select name="preferred_country" className="country-dropdown" value={formData.preferred_country} onChange={handleInputChange} required>
@@ -330,9 +340,6 @@ function App() {
           </>
         )}
 
-        {/* =========================================
-             SERVICES DETAIL VIEW
-           ========================================= */}
         {currentView === 'services' && (
           <section className="services-page-layout">
             <aside className="services-sidebar">
@@ -366,9 +373,6 @@ function App() {
           </section>
         )}
 
-        {/* =========================================
-             ABOUT US PAGE VIEW
-           ========================================= */}
         {currentView === 'about' && (
           <section className="about-page-layout">
             <div className="about-hero">
@@ -402,9 +406,7 @@ function App() {
           </section>
         )}
 
-        {/* =========================================
-             ✨ NEW: HIDDEN ADMIN DASHBOARD
-           ========================================= */}
+        {/* ADMIN DASHBOARD */}
         {currentView === 'admin' && (
           <section style={{ minHeight: '60vh', padding: '60px 20px', maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
             <h2 style={{ textAlign: 'center', color: '#0c4a6e', marginBottom: '30px', fontSize: '2.5rem' }}>Admin Control Panel</h2>
@@ -428,9 +430,17 @@ function App() {
               </div>
             ) : (
               <div style={{ overflowX: 'auto', background: 'white', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', padding: '20px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
                   <h3 style={{ color: '#0ea5e9', margin: 0 }}>Total Registered Candidates: {candidatesList.length}</h3>
-                  <button onClick={() => {setIsAuthenticated(false); setAdminPassword('');}} style={{ background: '#ef4444', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '6px', cursor: 'pointer' }}>Lock Dashboard</button>
+                  <div>
+                    {/* ✨ NEW BUTTON */}
+                    <button onClick={handleCopyToExcel} style={{ background: '#10b981', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '6px', cursor: 'pointer', marginRight: '10px', fontWeight: 'bold' }}>
+                      📋 Copy for Excel
+                    </button>
+                    <button onClick={() => {setIsAuthenticated(false); setAdminPassword('');}} style={{ background: '#ef4444', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>
+                      🔒 Lock Dashboard
+                    </button>
+                  </div>
                 </div>
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                   <thead>
@@ -438,20 +448,20 @@ function App() {
                       <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Name</th>
                       <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Email</th>
                       <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Phone</th>
-                      <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Target Job</th> {/* ✨ NEW HEADER */}
+                      <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Target Job</th>
                       <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Preferred Location</th>
                     </tr>
                   </thead>
                   <tbody>
                     {candidatesList.length === 0 ? (
-                      <tr><td colSpan="4" style={{ padding: '30px', textAlign: 'center', color: '#64748b' }}>No candidates found in the database.</td></tr>
+                      <tr><td colSpan="5" style={{ padding: '30px', textAlign: 'center', color: '#64748b' }}>No candidates found in the database.</td></tr>
                     ) : (
                       candidatesList.map((c, index) => (
                         <tr key={index} style={{ borderBottom: '1px solid #f1f5f9' }}>
                           <td style={{ padding: '15px', fontWeight: 'bold', color: '#334155' }}>{c.full_name}</td>
                           <td style={{ padding: '15px', color: '#475569' }}>{c.email}</td>
                           <td style={{ padding: '15px', color: '#475569' }}>{c.phone_number}</td>
-                          <td style={{ padding: '15px', color: '#0ea5e9', fontWeight: 'bold' }}>{c.preferred_job}</td> {/* ✨ NEW DATA */}
+                          <td style={{ padding: '15px', color: '#0ea5e9', fontWeight: 'bold' }}>{c.preferred_job}</td>
                           <td style={{ padding: '15px' }}>
                             <span style={{ background: '#e0f2fe', color: '#0369a1', padding: '5px 10px', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold' }}>
                               {c.preferred_country}
@@ -538,7 +548,6 @@ function App() {
           </div>
         </div>
         <div className="footer-bottom" style={{ marginTop: '30px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-          {/* ✨ NEW: The Secret Admin Door (Click the copyright text!) */}
           <p 
             onClick={() => {setCurrentView('admin'); window.scrollTo(0,0);}} 
             style={{ cursor: 'pointer', display: 'inline-block' }}
