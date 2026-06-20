@@ -310,8 +310,11 @@ function App() {
                   <input type="text" name="full_name" placeholder="Full Name" value={formData.full_name} onChange={handleInputChange} required />
                   <input type="email" name="email" placeholder="Email Address" value={formData.email} onChange={handleInputChange} required />
                   <input type="tel" name="phone_number" placeholder="Phone Number (Required)" value={formData.phone_number} onChange={handlePhoneChange} required />
+                  
+                  {/* ✨ THIS IS THE NEW FIELD */}
+                  <input type="text" name="preferred_job" placeholder="Target Job Role (e.g., Rigger, Nurse, Engineer)" value={formData.preferred_job} onChange={handleInputChange} required />
+                  
                   <select name="preferred_country" className="country-dropdown" value={formData.preferred_country} onChange={handleInputChange} required>
-                  <input type="text" name="preferred_job" placeholder="Target Job Role (e.g., Rigger, Nurse)" value={formData.preferred_job} onChange={handleInputChange} required />
                     <option value="" disabled>Select Preferred Country...</option>
                     <option value="Israel">Israel</option>
                     <option value="Europe">Europe (Portugal, Greece, Austria, etc.)</option>
