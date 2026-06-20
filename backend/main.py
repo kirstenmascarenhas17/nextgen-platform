@@ -47,6 +47,7 @@ class CandidateModel(BaseModel):
     email: str
     phone_number: str
     preferred_country: str
+    preferred_job: str # ✨ NEW FIELD
 
     @field_validator('phone_number')
     @classmethod
@@ -160,8 +161,9 @@ async def create_candidate(request: Request, candidate: CandidateModel):
     
     try:
         cursor = db.cursor()
-        sql = "INSERT INTO candidates (full_name, email, phone_number, preferred_country) VALUES (%s, %s, %s, %s)"
-        values = (candidate.full_name, candidate.email, candidate.phone_number, candidate.preferred_country)
+        # ✨ UPDATED SQL QUERY
+        sql = "INSERT INTO candidates (full_name, email, phone_number, preferred_country, preferred_job) VALUES (%s, %s, %s, %s, %s)"
+        values = (candidate.full_name, candidate.email, candidate.phone_number, candidate.preferred_country, candidate.preferred_job)
         
         cursor.execute(sql, values)
         db.commit()

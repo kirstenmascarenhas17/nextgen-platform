@@ -67,7 +67,7 @@ const SERVICES_INFO = [
 
 function App() {
   const [formData, setFormData] = useState({
-    full_name: '', email: '', phone_number: '', preferred_country: ''
+    full_name: '', email: '', phone_number: '', preferred_country: '', preferred_job: ''        
   });
   const [statusMessage, setStatusMessage] = useState('');
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -311,6 +311,7 @@ function App() {
                   <input type="email" name="email" placeholder="Email Address" value={formData.email} onChange={handleInputChange} required />
                   <input type="tel" name="phone_number" placeholder="Phone Number (Required)" value={formData.phone_number} onChange={handlePhoneChange} required />
                   <select name="preferred_country" className="country-dropdown" value={formData.preferred_country} onChange={handleInputChange} required>
+                  <input type="text" name="preferred_job" placeholder="Target Job Role (e.g., Rigger, Nurse)" value={formData.preferred_job} onChange={handleInputChange} required />
                     <option value="" disabled>Select Preferred Country...</option>
                     <option value="Israel">Israel</option>
                     <option value="Europe">Europe (Portugal, Greece, Austria, etc.)</option>
@@ -434,6 +435,7 @@ function App() {
                       <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Name</th>
                       <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Email</th>
                       <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Phone</th>
+                      <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Target Job</th> {/* ✨ NEW HEADER */}
                       <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Preferred Location</th>
                     </tr>
                   </thead>
@@ -446,6 +448,7 @@ function App() {
                           <td style={{ padding: '15px', fontWeight: 'bold', color: '#334155' }}>{c.full_name}</td>
                           <td style={{ padding: '15px', color: '#475569' }}>{c.email}</td>
                           <td style={{ padding: '15px', color: '#475569' }}>{c.phone_number}</td>
+                          <td style={{ padding: '15px', color: '#0ea5e9', fontWeight: 'bold' }}>{c.preferred_job}</td> {/* ✨ NEW DATA */}
                           <td style={{ padding: '15px' }}>
                             <span style={{ background: '#e0f2fe', color: '#0369a1', padding: '5px 10px', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold' }}>
                               {c.preferred_country}

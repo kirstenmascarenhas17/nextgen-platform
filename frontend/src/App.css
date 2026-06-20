@@ -776,6 +776,11 @@ body {
   
   .services-sidebar {
     width: 100%;
+    position: relative; /* Overrides the sticky behavior */
+    top: 0;
+    max-height: none;
+    margin-bottom: 20px;
+    overflow-y: visible;
   }
 
   .service-detail-block {
