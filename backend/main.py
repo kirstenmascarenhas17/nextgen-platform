@@ -9,6 +9,7 @@ import mysql.connector
 from mysql.connector import Error
 import google.generativeai as genai
 
+from datetime import datetime
 # ✨ NEW: Import the Security and Rate Limiting tools
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
@@ -58,6 +59,14 @@ class CandidateModel(BaseModel):
         if not re.match(r'^[6-9]\d{9}$', clean_number):
             raise ValueError('Invalid phone number. Must be a valid 10-digit Indian mobile number.')
         return clean_number
+
+class JobPostingModel(BaseModel):
+    title: str
+    country: str
+    salary: str
+    details: str
+    eligibility: str
+    expiry_date: datetime
 
 class ChatRequest(BaseModel):
     message: str
@@ -309,3 +318,42 @@ async def get_all_candidates(request: Request, secret: str = ""):
             cursor.close()
         if 'db' in locals() and db.is_connected():
             db.close()
+
+# ==========================================
+# PHASE 7: JOB BOARD ROUTES
+# ==========================================
+
+@app.get("/jobs")
+def get_active_jobs():
+    cursor = db.cursor()
+    # ✨ This query uses NOW() to ONLY fetch jobs that haven't expired!
+    sql = "SELECT * FROM job_postings WHERE expiry_date > NOW() ORDER BY expiry_date ASC"
+    cursor.execute(sql)
+    
+    # Converts the raw MySQL data into a clean JSON list
+    columns = [column[0] for column in cursor.description]
+    jobs = [dict(zip(columns, row)) for row in cursor.fetchall()]
+    return {"jobs": jobs}
+
+
+@app.post("/admin/jobs")
+def create_job_posting(job: JobPostingModel, secret: str):
+    # Add your PIN check here (e.g., if secret != "1234": raise HTTPException...)
+    cursor = db.cursor()
+    sql = """INSERT INTO job_postings (title, country, salary, details, eligibility, expiry_date) 
+             VALUES (%s, %s, %s, %s, %s, %s)"""
+    values = (job.title, job.country, job.salary, job.details, job.eligibility, job.expiry_date)
+    
+    cursor.execute(sql, values)
+    db.commit()
+    return {"message": "Job successfully posted!"}
+
+
+@app.delete("/admin/jobs/{job_id}")
+def delete_job_posting(job_id: int, secret: str):
+    # Add your PIN check here
+    cursor = db.cursor()
+    sql = "DELETE FROM job_postings WHERE id = %s"
+    cursor.execute(sql, (job_id,))
+    db.commit()
+    return {"message": "Job successfully deleted!"}
