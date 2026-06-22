@@ -80,6 +80,64 @@ function App() {
   const [candidatesList, setCandidatesList] = useState([]);
   const [adminError, setAdminError] = useState('');
 
+  // ✨ PHASE 7: JOB ADMIN STATES
+  const [adminTab, setAdminTab] = useState('candidates'); // switches between candidates and jobs
+  const [adminJobsList, setAdminJobsList] = useState([]);
+  const [jobFormData, setJobFormData] = useState({
+    title: '', country: '', salary: '', details: '', eligibility: '', expiry_date: ''
+  });
+
+  const fetchAdminJobs = async () => {
+    try {
+      const response = await fetch('https://nextgen-api-11jg.onrender.com/jobs');
+      if (response.ok) {
+        const data = await response.json();
+        setAdminJobsList(data.jobs);
+      }
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+    }
+  };
+
+  const handleJobFormChange = (e) => {
+    const { name, value } = e.target;
+    setJobFormData({ ...jobFormData, [name]: value });
+  };
+
+  const handleJobSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(`https://nextgen-api-11jg.onrender.com/admin/jobs?secret=${adminPassword}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(jobFormData),
+      });
+      if (response.ok) {
+        alert("Job posted successfully! The timer has started.");
+        setJobFormData({ title: '', country: '', salary: '', details: '', eligibility: '', expiry_date: '' });
+        fetchAdminJobs(); // Refresh the list
+      } else {
+        alert("Error posting job. Check your connection.");
+      }
+    } catch (error) {
+      alert("Server error.");
+    }
+  };
+
+  const handleJobDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this job early?")) return;
+    try {
+      const response = await fetch(`https://nextgen-api-11jg.onrender.com/admin/jobs/${id}?secret=${adminPassword}`, {
+        method: 'DELETE'
+      });
+      if (response.ok) {
+        fetchAdminJobs(); // Refresh the list
+      }
+    } catch (error) {
+      alert("Error deleting job.");
+    }
+  };
+
   useEffect(() => {
     const handleScroll = () => setShowScrollTop(window.scrollY > 300);
     window.addEventListener('scroll', handleScroll);
@@ -181,6 +239,7 @@ function App() {
         setCandidatesList(data.candidates);
         setIsAuthenticated(true);
         setAdminError('');
+        fetchAdminJobs(); // ✨ NEW: Fetch jobs on successful login
       } else {
         setAdminError('Incorrect PIN. Access Denied.');
       }
@@ -406,7 +465,7 @@ function App() {
 
         {/* ADMIN DASHBOARD */}
         {currentView === 'admin' && (
-          <section style={{ minHeight: '60vh', padding: '60px 20px', maxWidth: '1000px', margin: '0 auto', width: '100%' }}>
+          <section style={{ minHeight: '60vh', padding: '60px 20px', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
             <h2 style={{ textAlign: 'center', color: '#0c4a6e', marginBottom: '30px', fontSize: '2.5rem' }}>Admin Control Panel</h2>
             
             {!isAuthenticated ? (
@@ -427,49 +486,118 @@ function App() {
                 {adminError && <p style={{color: '#ef4444', textAlign: 'center', marginTop: '20px', fontWeight: 'bold'}}>{adminError}</p>}
               </div>
             ) : (
-              <div style={{ overflowX: 'auto', background: 'white', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', padding: '20px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
-                  <h3 style={{ color: '#0ea5e9', margin: 0 }}>Total Registered Candidates: {candidatesList.length}</h3>
-                  <div>
-                    {/* ✨ NEW BUTTON */}
-                    <button onClick={handleCopyToExcel} style={{ background: '#10b981', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '6px', cursor: 'pointer', marginRight: '10px', fontWeight: 'bold' }}>
-                      📋 Copy for Excel
+              <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', padding: '20px' }}>
+                
+                {/* ADMIN HEADER & TABS */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #f1f5f9', paddingBottom: '20px', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
+                  <div style={{ display: 'flex', gap: '15px' }}>
+                    <button 
+                      onClick={() => setAdminTab('candidates')} 
+                      style={{ background: adminTab === 'candidates' ? '#0ea5e9' : '#e2e8f0', color: adminTab === 'candidates' ? 'white' : '#475569', border: 'none', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
+                      📋 Candidates
                     </button>
+                    <button 
+                      onClick={() => setAdminTab('jobs')} 
+                      style={{ background: adminTab === 'jobs' ? '#0ea5e9' : '#e2e8f0', color: adminTab === 'jobs' ? 'white' : '#475569', border: 'none', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
+                      📢 Manage Jobs
+                    </button>
+                  </div>
+                  <div>
                     <button onClick={() => {setIsAuthenticated(false); setAdminPassword('');}} style={{ background: '#ef4444', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>
                       🔒 Lock Dashboard
                     </button>
                   </div>
                 </div>
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                  <thead>
-                    <tr style={{ background: '#f0f9ff', color: '#0c4a6e' }}>
-                      <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Name</th>
-                      <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Email</th>
-                      <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Phone</th>
-                      <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Target Job</th>
-                      <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Preferred Location</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {candidatesList.length === 0 ? (
-                      <tr><td colSpan="5" style={{ padding: '30px', textAlign: 'center', color: '#64748b' }}>No candidates found in the database.</td></tr>
-                    ) : (
-                      candidatesList.map((c, index) => (
-                        <tr key={index} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                          <td style={{ padding: '15px', fontWeight: 'bold', color: '#334155' }}>{c.full_name}</td>
-                          <td style={{ padding: '15px', color: '#475569' }}>{c.email}</td>
-                          <td style={{ padding: '15px', color: '#475569' }}>{c.phone_number}</td>
-                          <td style={{ padding: '15px', color: '#0ea5e9', fontWeight: 'bold' }}>{c.preferred_job}</td>
-                          <td style={{ padding: '15px' }}>
-                            <span style={{ background: '#e0f2fe', color: '#0369a1', padding: '5px 10px', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold' }}>
-                              {c.preferred_country}
-                            </span>
-                          </td>
+
+                {/* TAB 1: CANDIDATES */}
+                {adminTab === 'candidates' && (
+                  <div style={{ overflowX: 'auto' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
+                      <h3 style={{ color: '#0ea5e9', margin: 0 }}>Total Registered Candidates: {candidatesList.length}</h3>
+                      <button onClick={handleCopyToExcel} style={{ background: '#10b981', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>
+                        📋 Copy for Excel
+                      </button>
+                    </div>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                      <thead>
+                        <tr style={{ background: '#f0f9ff', color: '#0c4a6e' }}>
+                          <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Name</th>
+                          <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Email</th>
+                          <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Phone</th>
+                          <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Target Job</th>
+                          <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Preferred Location</th>
                         </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
+                      </thead>
+                      <tbody>
+                        {candidatesList.length === 0 ? (
+                          <tr><td colSpan="5" style={{ padding: '30px', textAlign: 'center', color: '#64748b' }}>No candidates found in the database.</td></tr>
+                        ) : (
+                          candidatesList.map((c, index) => (
+                            <tr key={index} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                              <td style={{ padding: '15px', fontWeight: 'bold', color: '#334155' }}>{c.full_name}</td>
+                              <td style={{ padding: '15px', color: '#475569' }}>{c.email}</td>
+                              <td style={{ padding: '15px', color: '#475569' }}>{c.phone_number}</td>
+                              <td style={{ padding: '15px', color: '#0ea5e9', fontWeight: 'bold' }}>{c.preferred_job}</td>
+                              <td style={{ padding: '15px' }}>
+                                <span style={{ background: '#e0f2fe', color: '#0369a1', padding: '5px 10px', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold' }}>
+                                  {c.preferred_country}
+                                </span>
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                {/* TAB 2: MANAGE JOBS */}
+                {adminTab === 'jobs' && (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '40px' }}>
+                    {/* Job Creator Form */}
+                    <div style={{ background: '#f8fafc', padding: '25px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                      <h3 style={{ color: '#0f172a', marginBottom: '20px' }}>Publish New Job</h3>
+                      <form onSubmit={handleJobSubmit} className="apply-form">
+                        <input type="text" name="title" placeholder="Job Title (e.g. Mechanical Site Manager)" value={jobFormData.title} onChange={handleJobFormChange} required />
+                        <input type="text" name="country" placeholder="Country (e.g. Israel)" value={jobFormData.country} onChange={handleJobFormChange} required />
+                        <input type="text" name="salary" placeholder="Salary (e.g. ₹2.5 - ₹4.5 Lakhs Per Month)" value={jobFormData.salary} onChange={handleJobFormChange} required />
+                        
+                        <textarea name="details" placeholder="Job Details (Bullet points: Contract, Accommodation, etc.)" value={jobFormData.details} onChange={handleJobFormChange} rows="4" style={{ padding: '14px', borderRadius: '8px', border: '1px solid #ddd', fontFamily: 'inherit', resize: 'vertical', width: '100%' }} required></textarea>
+                        
+                        <textarea name="eligibility" placeholder="Eligibility Criteria (Experience, Skills, etc.)" value={jobFormData.eligibility} onChange={handleJobFormChange} rows="4" style={{ padding: '14px', borderRadius: '8px', border: '1px solid #ddd', fontFamily: 'inherit', resize: 'vertical', width: '100%' }} required></textarea>
+                        
+                        <div style={{ width: '100%' }}>
+                          <label style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 'bold', marginBottom: '5px', display: 'block' }}>Post Expiration Date & Time</label>
+                          <input type="datetime-local" name="expiry_date" value={jobFormData.expiry_date} onChange={handleJobFormChange} required style={{ width: '100%' }} />
+                        </div>
+
+                        <button type="submit" style={{ background: '#10b981', width: '100%' }}>Publish Job Post</button>
+                      </form>
+                    </div>
+
+                    {/* Active Jobs List */}
+                    <div>
+                      <h3 style={{ color: '#0f172a', marginBottom: '20px' }}>Active Job Postings ({adminJobsList.length})</h3>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', maxHeight: '600px', overflowY: 'auto', paddingRight: '10px' }}>
+                        {adminJobsList.length === 0 ? (
+                          <p style={{ color: '#64748b', textAlign: 'center', padding: '20px', background: '#f8fafc', borderRadius: '8px' }}>No active jobs. Expired jobs hide automatically.</p>
+                        ) : (
+                          adminJobsList.map((job) => (
+                            <div key={job.id} style={{ padding: '15px', border: '1px solid #e2e8f0', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'white' }}>
+                              <div>
+                                <h4 style={{ margin: '0 0 5px 0', color: '#0ea5e9' }}>{job.title}</h4>
+                                <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b', fontWeight: 'bold' }}>{job.country} • Valid till: {new Date(job.expiry_date).toLocaleDateString()}</p>
+                              </div>
+                              <button onClick={() => handleJobDelete(job.id)} style={{ background: '#fee2e2', color: '#ef4444', border: 'none', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>
+                                Delete
+                              </button>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </section>
