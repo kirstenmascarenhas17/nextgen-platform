@@ -164,15 +164,20 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(jobFormData),
       });
+      
+      // ✨ We are extracting the exact error message sent by FastAPI
+      const data = await response.json(); 
+      
       if (response.ok) {
         alert("Job posted successfully! The timer has started.");
         setJobFormData({ title: '', country: '', salary: '', details: '', eligibility: '', expiry_date: '' });
-        fetchAdminJobs();
+        fetchAdminJobs(); // Refresh the list
       } else {
-        alert("Error posting job. Check your connection.");
+        // ✨ This will now pop up with the EXACT Python error (e.g., "Table doesn't exist" or "Validation Error")
+        alert(`Backend Error: ${data.detail || JSON.stringify(data)}`);
       }
     } catch (error) {
-      alert("Server error.");
+      alert(`Network/Server Crash: ${error.message}`);
     }
   };
 
