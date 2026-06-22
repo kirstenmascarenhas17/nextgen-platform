@@ -80,12 +80,64 @@ function App() {
   const [candidatesList, setCandidatesList] = useState([]);
   const [adminError, setAdminError] = useState('');
 
-  // ✨ PHASE 7: JOB ADMIN STATES
-  const [adminTab, setAdminTab] = useState('candidates'); // switches between candidates and jobs
+  // ADMIN STATES
+  const [adminTab, setAdminTab] = useState('candidates');
   const [adminJobsList, setAdminJobsList] = useState([]);
   const [jobFormData, setJobFormData] = useState({
     title: '', country: '', salary: '', details: '', eligibility: '', expiry_date: ''
   });
+
+  // ✨ PHASE 7: PUBLIC JOB BOARD STATES
+  const [publicJobsList, setPublicJobsList] = useState([]);
+  const [selectedCountryFilter, setSelectedCountryFilter] = useState('All');
+  const [searchJobTitle, setSearchJobTitle] = useState('');
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Ticks every 60 seconds to update live countdown timers
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 60000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const fetchPublicJobs = async () => {
+    try {
+      const response = await fetch('https://nextgen-api-11jg.onrender.com/jobs');
+      if (response.ok) {
+        const data = await response.json();
+        setPublicJobsList(data.jobs);
+      }
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+    }
+  };
+
+  const calculateTimeLeft = (expiryDate) => {
+    const difference = new Date(expiryDate) - currentTime;
+    if (difference <= 0) return "Expired";
+    
+    const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((difference / 1000 / 60) % 60);
+    
+    if (days > 0) return `${days}d ${hours}h left`;
+    if (hours > 0) return `${hours}h ${minutes}m left`;
+    return `${minutes}m left`;
+  };
+
+  const filteredJobs = publicJobsList.filter(job => {
+    const matchesCountry = selectedCountryFilter === 'All' || job.country === selectedCountryFilter;
+    const matchesTitle = job.title.toLowerCase().includes(searchJobTitle.toLowerCase());
+    return matchesCountry && matchesTitle;
+  });
+
+  const navigateToJobs = (e) => {
+    if(e) e.preventDefault();
+    setCurrentView('jobs');
+    fetchPublicJobs();
+    setSelectedJob(null);
+    window.scrollTo(0, 0);
+  };
 
   const fetchAdminJobs = async () => {
     try {
@@ -115,7 +167,7 @@ function App() {
       if (response.ok) {
         alert("Job posted successfully! The timer has started.");
         setJobFormData({ title: '', country: '', salary: '', details: '', eligibility: '', expiry_date: '' });
-        fetchAdminJobs(); // Refresh the list
+        fetchAdminJobs();
       } else {
         alert("Error posting job. Check your connection.");
       }
@@ -131,7 +183,7 @@ function App() {
         method: 'DELETE'
       });
       if (response.ok) {
-        fetchAdminJobs(); // Refresh the list
+        fetchAdminJobs();
       }
     } catch (error) {
       alert("Error deleting job.");
@@ -195,17 +247,6 @@ function App() {
     }, 100);
   };
 
-  const scrollToService = (id, e) => {
-    if(e) e.preventDefault();
-    const element = document.getElementById(id);
-    if (element) {
-      const headerOffset = 80;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-      window.scrollTo({ top: offsetPosition, behavior: "smooth" });
-    }
-  };
-
   const scrollToContact = (e) => {
     if(e) e.preventDefault();
     const footer = document.getElementById('contact');
@@ -239,7 +280,7 @@ function App() {
         setCandidatesList(data.candidates);
         setIsAuthenticated(true);
         setAdminError('');
-        fetchAdminJobs(); // ✨ NEW: Fetch jobs on successful login
+        fetchAdminJobs();
       } else {
         setAdminError('Incorrect PIN. Access Denied.');
       }
@@ -248,19 +289,15 @@ function App() {
     }
   };
 
-  // ✨ NEW: Copy to Excel Function
   const handleCopyToExcel = () => {
     if (candidatesList.length === 0) {
       alert("No data available to copy.");
       return;
     }
-
-    // Creating Tab-Separated string for perfect Excel pasting
     let excelData = "Name\tEmail\tPhone\tTarget Job\tPreferred Location\n";
     candidatesList.forEach(c => {
       excelData += `${c.full_name}\t${c.email}\t${c.phone_number}\t${c.preferred_job}\t${c.preferred_country}\n`;
     });
-
     navigator.clipboard.writeText(excelData).then(() => {
       alert("✅ Data copied to clipboard! Open Excel and press Ctrl+V to paste.");
     }).catch(err => {
@@ -316,7 +353,6 @@ function App() {
     <div className="app-container" id="home">
       
       <header className="navbar sticky-header">
-        {/* ✨ UPDATED: Image-only logo section */}
         <div className="logo-section" onClick={navigateToHome} style={{ cursor: 'pointer' }}>
           <img src={logoImg} alt="NextGen Consultancy" className="main-logo-full" />
         </div>
@@ -352,6 +388,12 @@ function App() {
                   <span><IoCheckmarkCircle className="check-icon" /> Austria</span>
                   <span><IoCheckmarkCircle className="check-icon" /> UAE</span>
                 </div>
+              </div>
+
+              {/* ✨ NEW: GLOWING JOB BOARD BANNER */}
+              <div className="glow-banner" onClick={navigateToJobs}>
+                <h2>🔥 Current Job Openings 🔥</h2>
+                <p>Click here to view live international opportunities before they expire!</p>
               </div>
 
               <div id="services" className="services-section">
@@ -395,6 +437,86 @@ function App() {
               </div>
             </section>
           </>
+        )}
+
+        {/* ✨ NEW: DYNAMIC JOB BOARD VIEW */}
+        {currentView === 'jobs' && (
+          <section className="jobs-page-layout">
+            {!selectedJob ? (
+              <>
+                <div className="jobs-header">
+                  <h1 className="jobs-title">Current Job Openings</h1>
+                  <div className="jobs-filter-group">
+                    <input 
+                      type="text" 
+                      className="job-search-bar" 
+                      placeholder="Search job title..." 
+                      value={searchJobTitle} 
+                      onChange={(e) => setSearchJobTitle(e.target.value)} 
+                    />
+                    <select 
+                      className="country-filter" 
+                      value={selectedCountryFilter} 
+                      onChange={(e) => setSelectedCountryFilter(e.target.value)}
+                    >
+                      <option value="All">All Countries</option>
+                      {/* Pull unique countries from the active jobs list */}
+                      {[...new Set(publicJobsList.map(job => job.country))].map(c => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="jobs-grid">
+                  {filteredJobs.length === 0 ? (
+                    <div className="empty-jobs">No posts currently available. Please check back later!</div>
+                  ) : (
+                    filteredJobs.map(job => (
+                      <div key={job.id} className="job-tile" onClick={() => setSelectedJob(job)}>
+                        <h3>{job.title}</h3>
+                        <p className="job-country"><FaMapMarkerAlt size={14}/> {job.country}</p>
+                        <p className="job-salary">{job.salary}</p>
+                        <div className="job-timer">
+                          ⏳ {calculateTimeLeft(job.expiry_date)}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </>
+            ) : (
+              <div className="job-deep-dive">
+                <button onClick={() => setSelectedJob(null)} className="back-btn">
+                  <FaChevronLeft size={12}/> Back to Jobs List
+                </button>
+                <h2>{selectedJob.title}</h2>
+                <div className="job-meta-header">
+                  <span><FaMapMarkerAlt size={16}/> {selectedJob.country}</span>
+                  <span className="meta-salary">{selectedJob.salary}</span>
+                  <span className="meta-timer">⏳ Expires in: {calculateTimeLeft(selectedJob.expiry_date)}</span>
+                </div>
+                
+                <div className="job-details-box">
+                  <h3>Job Details</h3>
+                  <pre>{selectedJob.details}</pre>
+                </div>
+
+                <div className="job-details-box">
+                  <h3>Eligibility Criteria</h3>
+                  <pre>{selectedJob.eligibility}</pre>
+                </div>
+
+                <button className="apply-now-btn" onClick={() => {
+                  // ✨ AUTO-FILL MAGIC: Fill form with target job and navigate to register!
+                  setFormData({ ...formData, preferred_job: selectedJob.title, preferred_country: selectedJob.country === 'Israel' || selectedJob.country === 'UAE' || selectedJob.country === 'Singapore' ? selectedJob.country : 'Europe' });
+                  navigateToRegistration();
+                }}>
+                  Apply Now for this Position
+                </button>
+              </div>
+            )}
+          </section>
         )}
 
         {currentView === 'services' && (
@@ -463,7 +585,6 @@ function App() {
           </section>
         )}
 
-        {/* ADMIN DASHBOARD */}
         {currentView === 'admin' && (
           <section style={{ minHeight: '60vh', padding: '60px 20px', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
             <h2 style={{ textAlign: 'center', color: '#0c4a6e', marginBottom: '30px', fontSize: '2.5rem' }}>Admin Control Panel</h2>
@@ -488,7 +609,6 @@ function App() {
             ) : (
               <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', padding: '20px' }}>
                 
-                {/* ADMIN HEADER & TABS */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #f1f5f9', paddingBottom: '20px', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
                   <div style={{ display: 'flex', gap: '15px' }}>
                     <button 
@@ -509,7 +629,6 @@ function App() {
                   </div>
                 </div>
 
-                {/* TAB 1: CANDIDATES */}
                 {adminTab === 'candidates' && (
                   <div style={{ overflowX: 'auto' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
@@ -551,10 +670,8 @@ function App() {
                   </div>
                 )}
 
-                {/* TAB 2: MANAGE JOBS */}
                 {adminTab === 'jobs' && (
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '40px' }}>
-                    {/* Job Creator Form */}
                     <div style={{ background: '#f8fafc', padding: '25px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
                       <h3 style={{ color: '#0f172a', marginBottom: '20px' }}>Publish New Job</h3>
                       <form onSubmit={handleJobSubmit} className="apply-form">
@@ -575,7 +692,6 @@ function App() {
                       </form>
                     </div>
 
-                    {/* Active Jobs List */}
                     <div>
                       <h3 style={{ color: '#0f172a', marginBottom: '20px' }}>Active Job Postings ({adminJobsList.length})</h3>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', maxHeight: '600px', overflowY: 'auto', paddingRight: '10px' }}>
@@ -608,12 +724,7 @@ function App() {
       <footer className="premium-footer" id="contact">
         <div 
           className="footer-grid" 
-          style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', 
-            gap: '30px', 
-            alignItems: 'start' 
-          }}
+          style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '30px', alignItems: 'start' }}
         >
           <div className="footer-col">
             <h3>NextGen Consultancy</h3>
@@ -640,46 +751,23 @@ function App() {
           <div className="footer-col">
             <h3>Contact Us</h3>
             <div style={{ marginBottom: '15px' }}>
-              <p style={{ fontSize: '14px', marginBottom: '12px' }}>
-                <FaPhoneAlt size={12} style={{ marginRight: '8px', color: '#38bdf8' }} /> +91 9076011522 / +91 9076011499
-              </p>
-              <p style={{ fontSize: '14px', marginBottom: '12px' }}>
-                <FaPhoneAlt size={12} style={{ marginRight: '8px', color: '#38bdf8' }} /> +91 9076012125 / +91 9076011175
-              </p>
-              <p style={{ fontSize: '14px', marginBottom: '12px' }}>
-                <a href="mailto:careers@nextgen-consultancy.net" style={{ color: 'inherit', textDecoration: 'none' }}>
-                  <FaEnvelope size={12} style={{ marginRight: '8px', color: '#38bdf8' }} /> careers@nextgen-consultancy.net
-                </a>
-              </p>
-              <p style={{ fontSize: '14px' }}>
-                <a href="mailto:info.nextgenconsultancy1@gmail.com" style={{ color: 'inherit', textDecoration: 'none' }}>
-                  <FaEnvelope size={12} style={{ marginRight: '8px', color: '#38bdf8' }} /> info.nextgenconsultancy1@gmail.com
-                </a>
-              </p>
+              <p style={{ fontSize: '14px', marginBottom: '12px' }}><FaPhoneAlt size={12} style={{ marginRight: '8px', color: '#38bdf8' }} /> +91 9076011522 / +91 9076011499</p>
+              <p style={{ fontSize: '14px', marginBottom: '12px' }}><FaPhoneAlt size={12} style={{ marginRight: '8px', color: '#38bdf8' }} /> +91 9076012125 / +91 9076011175</p>
+              <p style={{ fontSize: '14px', marginBottom: '12px' }}><a href="mailto:careers@nextgen-consultancy.net" style={{ color: 'inherit', textDecoration: 'none' }}><FaEnvelope size={12} style={{ marginRight: '8px', color: '#38bdf8' }} /> careers@nextgen-consultancy.net</a></p>
+              <p style={{ fontSize: '14px' }}><a href="mailto:info.nextgenconsultancy1@gmail.com" style={{ color: 'inherit', textDecoration: 'none' }}><FaEnvelope size={12} style={{ marginRight: '8px', color: '#38bdf8' }} /> info.nextgenconsultancy1@gmail.com</a></p>
             </div>
           </div>
           <div className="footer-col">
             <h3>Follow Us</h3>
             <div className="social-links" style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '10px' }}>
-              <a href="https://www.facebook.com/share/14aEPTxdTQg/" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', fontSize: '15px' }}>
-                <FaFacebook size={20} style={{ marginRight: '10px' }} /> Facebook
-              </a>
-              <a href="https://www.instagram.com/info.nextgen?igsh=MWs3aGF1NjZhdGJ6aw==" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', fontSize: '15px' }}>
-                <FaInstagram size={20} style={{ marginRight: '10px' }} /> Instagram
-              </a>
-              <a href="https://www.linkedin.com/in/nextgen-consultancy-430269397" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', fontSize: '15px' }}>
-                <FaLinkedin size={20} style={{ marginRight: '10px' }} /> LinkedIn
-              </a>
+              <a href="https://www.facebook.com/share/14aEPTxdTQg/" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', fontSize: '15px' }}><FaFacebook size={20} style={{ marginRight: '10px' }} /> Facebook</a>
+              <a href="https://www.instagram.com/info.nextgen?igsh=MWs3aGF1NjZhdGJ6aw==" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', fontSize: '15px' }}><FaInstagram size={20} style={{ marginRight: '10px' }} /> Instagram</a>
+              <a href="https://www.linkedin.com/in/nextgen-consultancy-430269397" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', fontSize: '15px' }}><FaLinkedin size={20} style={{ marginRight: '10px' }} /> LinkedIn</a>
             </div>
           </div>
         </div>
         <div className="footer-bottom" style={{ marginTop: '30px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-          <p 
-            onClick={() => {setCurrentView('admin'); window.scrollTo(0,0);}} 
-            style={{ cursor: 'pointer', display: 'inline-block' }}
-          >
-            &copy; 2026 NextGen Consultancy. All rights reserved.
-          </p>
+          <p onClick={() => {setCurrentView('admin'); window.scrollTo(0,0);}} style={{ cursor: 'pointer', display: 'inline-block' }}>&copy; 2026 NextGen Consultancy. All rights reserved.</p>
         </div>
       </footer>
 
@@ -689,9 +777,7 @@ function App() {
       </a>
 
       {showScrollTop && (
-        <button onClick={scrollToTop} className="scroll-to-top">
-          <FaArrowUp size={18} />
-        </button>
+        <button onClick={scrollToTop} className="scroll-to-top"><FaArrowUp size={18} /></button>
       )}
 
       <AiChatWidget />
