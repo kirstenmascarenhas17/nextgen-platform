@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import logoImg from './assets/logo.jpg'
+import logoImg from './assets/logo.svg'
 import './App.css'
 import AiChatWidget from './components/AiChatWidget';
 
@@ -257,11 +257,9 @@ function App() {
     <div className="app-container" id="home">
       
       <header className="navbar sticky-header">
+        {/* ✨ UPDATED: Image-only logo section */}
         <div className="logo-section" onClick={navigateToHome} style={{ cursor: 'pointer' }}>
-          <img src={logoImg} alt="NextGen Consultancy Logo" className="main-logo" />
-          <div className="logo-text">
-            <h1 className="company-name">NextGen Consultancy</h1>
-          </div>
+          <img src={logoImg} alt="NextGen Consultancy" className="main-logo-full" />
         </div>
         
         <nav className="desktop-nav">

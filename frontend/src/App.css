@@ -43,26 +43,17 @@ body {
 .logo-section {
   display: flex;
   align-items: center;
-  gap: 15px;
 }
 
-.main-logo {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  object-fit: cover;
+.main-logo-full {
+  height: 65px; /* Perfectly sizes the wide logo for the navbar */
+  width: auto;
+  object-fit: contain;
+  transition: transform 0.2s ease;
 }
 
-.logo-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.company-name {
-  font-size: 1.4rem;
-  font-weight: 800;
-  color: #1a1a2b;
-  line-height: 1.2;
+.main-logo-full:hover {
+  transform: scale(1.02); /* Slight pop effect when hovered */
 }
 
 .desktop-nav {
@@ -752,7 +743,11 @@ body {
     text-align: center;
   }
 
-  /* ✨ Mobile Hero Fixes */
+  /* ✨ Mobile Logo & Hero Fixes */
+  .main-logo-full {
+    height: 45px;
+  }
+
   .home-hero-section {
     padding: 100px 15px 120px 15px;
   }
