@@ -342,7 +342,7 @@ def get_active_jobs():
 @app.post("/admin/jobs")
 def create_job_posting(job: JobPostingModel, secret: str):
     try:
-        db.ping(reconnect=True, attempts=3, delay=2) # ✨ Wake up DB
+        db.ping(reconnect=True)
         cursor = db.cursor()
         sql = """INSERT INTO job_postings (title, country, salary, details, eligibility, expiry_date) 
                  VALUES (%s, %s, %s, %s, %s, %s)"""
