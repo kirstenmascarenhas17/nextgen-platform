@@ -3,7 +3,7 @@ import logoImg from './assets/logo.svg'
 import './App.css'
 import AiChatWidget from './components/AiChatWidget';
 
-import { FaFacebook, FaInstagram, FaLinkedin, FaWhatsapp, FaPhoneAlt, FaEnvelope, FaArrowUp, FaMapMarkerAlt, FaShip, FaOilCan, FaHardHat, FaPowerOff, FaHotel, FaHeartbeat, FaLaptopCode, FaTruckLoading, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaFacebook, FaInstagram, FaLinkedin, FaWhatsapp, FaPhoneAlt, FaEnvelope, FaArrowUp, FaMapMarkerAlt, FaShip, FaOilCan, FaHardHat, FaPowerOff, FaHotel, FaHeartbeat, FaLaptopCode, FaTruckLoading, FaChevronLeft, FaChevronRight, FaBriefcase, FaArrowRight } from 'react-icons/fa';
 import { IoCheckmarkCircle, IoCheckmarkDoneCircle } from 'react-icons/io5';
 
 const SERVICES_INFO = [
@@ -390,10 +390,20 @@ function App() {
                 </div>
               </div>
 
-              {/* ✨ NEW: GLOWING JOB BOARD BANNER */}
-              <div className="glow-banner" onClick={navigateToJobs}>
-                <h2>🔥 Current Job Openings 🔥</h2>
-                <p>Click here to view live international opportunities before they expire!</p>
+              {/* ✨ NEW: PREMIUM CORPORATE JOB BOARD BANNER */}
+              <div className="premium-job-banner" onClick={navigateToJobs}>
+                <div className="banner-content">
+                  <div className="banner-icon-wrapper">
+                    <FaBriefcase className="banner-icon" />
+                  </div>
+                  <div className="banner-text-wrapper">
+                    <h2>Active Global Placements</h2>
+                    <p>Explore current international job openings and apply directly.</p>
+                  </div>
+                </div>
+                <div className="banner-arrow">
+                  <FaArrowRight />
+                </div>
               </div>
 
               <div id="services" className="services-section">
