@@ -325,14 +325,17 @@ async def get_all_candidates(request: Request, secret: str = ""):
 
 @app.get("/jobs")
 def get_active_jobs():
+    db = get_db_connection()
+    if not db: return {"jobs": []}
     try:
-        db.ping(reconnect=True, attempts=3, delay=2) # ✨ Wake up DB if it went to sleep!
         cursor = db.cursor()
         sql = "SELECT * FROM job_postings WHERE expiry_date > NOW() ORDER BY expiry_date ASC"
         cursor.execute(sql)
         
         columns = [column[0] for column in cursor.description]
         jobs = [dict(zip(columns, row)) for row in cursor.fetchall()]
+        cursor.close()
+        db.close()
         return {"jobs": jobs}
     except Exception as e:
         print(f"Error fetching jobs: {e}")
@@ -341,35 +344,44 @@ def get_active_jobs():
 
 @app.post("/admin/jobs")
 def create_job_posting(job: JobPostingModel, secret: str):
+    if secret != "NextGenAdmin2026": # Added your PIN check here
+        raise HTTPException(status_code=401, detail="Unauthorized")
+        
+    db = get_db_connection()
+    if not db: raise HTTPException(status_code=500, detail="DB connection failed")
     try:
-        db.ping(reconnect=True)
         cursor = db.cursor()
         sql = """INSERT INTO job_postings (title, country, salary, details, eligibility, expiry_date) 
                  VALUES (%s, %s, %s, %s, %s, %s)"""
                  
-        # ✨ Safely convert Python datetime into a MySQL timestamp string
         formatted_date = job.expiry_date.strftime('%Y-%m-%d %H:%M:%S')
         values = (job.title, job.country, job.salary, job.details, job.eligibility, formatted_date)
         
         cursor.execute(sql, values)
         db.commit()
+        cursor.close()
+        db.close()
         return {"message": "Job successfully posted!"}
     except Exception as e:
         print(f"Error creating job: {e}")
-        from fastapi import HTTPException
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.delete("/admin/jobs/{job_id}")
 def delete_job_posting(job_id: int, secret: str):
+    if secret != "NextGenAdmin2026": # Added your PIN check here
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+    db = get_db_connection()
+    if not db: raise HTTPException(status_code=500, detail="DB connection failed")
     try:
-        db.ping(reconnect=True, attempts=3, delay=2) # ✨ Wake up DB
         cursor = db.cursor()
         sql = "DELETE FROM job_postings WHERE id = %s"
         cursor.execute(sql, (job_id,))
         db.commit()
+        cursor.close()
+        db.close()
         return {"message": "Job successfully deleted!"}
     except Exception as e:
         print(f"Error deleting job: {e}")
-        from fastapi import HTTPException
         raise HTTPException(status_code=500, detail=str(e))
