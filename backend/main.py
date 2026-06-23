@@ -320,22 +320,22 @@ async def get_all_candidates(request: Request, secret: str = ""):
             db.close()
 
 # ==========================================
-# PHASE 7: JOB BOARD ROUTES
+# PHASE 7: JOB BOARD ROUTES (FINAL FIX)
 # ==========================================
 
 @app.get("/jobs")
 def get_active_jobs():
-    db = get_db_connection()
-    if not db: return {"jobs": []}
+    conn = get_db_connection() # Use 'conn' instead of 'db'
+    if not conn: return {"jobs": []}
     try:
-        cursor = db.cursor()
+        cursor = conn.cursor()
         sql = "SELECT * FROM job_postings WHERE expiry_date > NOW() ORDER BY expiry_date ASC"
         cursor.execute(sql)
         
         columns = [column[0] for column in cursor.description]
         jobs = [dict(zip(columns, row)) for row in cursor.fetchall()]
         cursor.close()
-        db.close()
+        conn.close()
         return {"jobs": jobs}
     except Exception as e:
         print(f"Error fetching jobs: {e}")
@@ -344,13 +344,13 @@ def get_active_jobs():
 
 @app.post("/admin/jobs")
 def create_job_posting(job: JobPostingModel, secret: str):
-    if secret != "NextGenAdmin2026": # Added your PIN check here
+    if secret != "NextGenAdmin2026":
         raise HTTPException(status_code=401, detail="Unauthorized")
         
-    db = get_db_connection()
-    if not db: raise HTTPException(status_code=500, detail="DB connection failed")
+    conn = get_db_connection() # Use 'conn'
+    if not conn: raise HTTPException(status_code=500, detail="DB connection failed")
     try:
-        cursor = db.cursor()
+        cursor = conn.cursor()
         sql = """INSERT INTO job_postings (title, country, salary, details, eligibility, expiry_date) 
                  VALUES (%s, %s, %s, %s, %s, %s)"""
                  
@@ -358,9 +358,9 @@ def create_job_posting(job: JobPostingModel, secret: str):
         values = (job.title, job.country, job.salary, job.details, job.eligibility, formatted_date)
         
         cursor.execute(sql, values)
-        db.commit()
+        conn.commit()
         cursor.close()
-        db.close()
+        conn.close()
         return {"message": "Job successfully posted!"}
     except Exception as e:
         print(f"Error creating job: {e}")
@@ -369,18 +369,18 @@ def create_job_posting(job: JobPostingModel, secret: str):
 
 @app.delete("/admin/jobs/{job_id}")
 def delete_job_posting(job_id: int, secret: str):
-    if secret != "NextGenAdmin2026": # Added your PIN check here
+    if secret != "NextGenAdmin2026":
         raise HTTPException(status_code=401, detail="Unauthorized")
 
-    db = get_db_connection()
-    if not db: raise HTTPException(status_code=500, detail="DB connection failed")
+    conn = get_db_connection() # Use 'conn'
+    if not conn: raise HTTPException(status_code=500, detail="DB connection failed")
     try:
-        cursor = db.cursor()
+        cursor = conn.cursor()
         sql = "DELETE FROM job_postings WHERE id = %s"
         cursor.execute(sql, (job_id,))
-        db.commit()
+        conn.commit()
         cursor.close()
-        db.close()
+        conn.close()
         return {"message": "Job successfully deleted!"}
     except Exception as e:
         print(f"Error deleting job: {e}")
