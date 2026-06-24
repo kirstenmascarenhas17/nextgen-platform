@@ -2,8 +2,8 @@
 
 ![NextGen Consultancy](https://i.postimg.cc/MHSrKGLX/logo2.png)
 
-**Live Demo:** [Insert your live frontend URL here]  
-**Backend API:** [Insert your live Render URL here]
+**Live Demo:** [https://www.nextgen-consultancy.net](https://www.nextgen-consultancy.net)  
+**Backend API:** [https://nextgen-api-11jg.onrender.com](https://nextgen-api-11jg.onrender.com)
 
 An enterprise-grade, full-stack recruitment platform built to streamline global placement operations. This application features a fully responsive React frontend, a secure Python FastAPI backend, a comprehensive MySQL relational database, and deep integration with Google's Gemini AI for dynamic data extraction and automated workflows.
 
