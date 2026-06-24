@@ -290,11 +290,31 @@ function App() {
     }
   };
 
+  const handleStatusChange = async (candidateId, newStatus) => {
+    try {
+      const response = await fetch(`https://nextgen-api-11jg.onrender.com/admin/candidates/${candidateId}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus, secret: adminPassword })
+      });
+      if (response.ok) {
+        // Update the UI instantly without needing to refresh the page
+        setCandidatesList(prevList => 
+          prevList.map(c => c.id === candidateId ? { ...c, status: newStatus } : c)
+        );
+      } else {
+        alert("Failed to update candidate status.");
+      }
+    } catch (error) {
+      alert("Network error while updating status.");
+    }
+  };
+
   const handleCopyToExcel = () => {
     if (candidatesList.length === 0) return alert("No data available to copy.");
-    let excelData = "Name\tEmail\tPhone\tTarget Job\tPreferred Location\n";
+    let excelData = "Name\tEmail\tPhone\tTarget Job\tPreferred Location\tPipeline Status\n";
     candidatesList.forEach(c => {
-      excelData += `${c.full_name}\t${c.email}\t${c.phone_number}\t${c.preferred_job}\t${c.preferred_country}\n`;
+      excelData += `${c.full_name}\t${c.email}\t${c.phone_number}\t${c.preferred_job}\t${c.preferred_country}\t${c.status || 'Registered'}\n`;
     });
     navigator.clipboard.writeText(excelData).then(() => {
       alert("✅ Data copied to clipboard! Open Excel and press Ctrl+V to paste.");
@@ -599,16 +619,60 @@ function App() {
                     <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                       <thead>
                         <tr style={{ background: '#f0f9ff', color: '#0c4a6e' }}>
-                          <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Name</th><th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Email</th><th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Phone</th><th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Target Job</th><th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Preferred Location</th>
+                          <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Name</th>
+                          <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Email</th>
+                          <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Phone</th>
+                          <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Target Job</th>
+                          <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Location</th>
+                          <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Pipeline Status</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {candidatesList.length === 0 ? <tr><td colSpan="5" style={{ padding: '30px', textAlign: 'center', color: '#64748b' }}>No candidates found in the database.</td></tr> : 
-                          candidatesList.map((c, index) => (
-                            <tr key={index} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                              <td style={{ padding: '15px', fontWeight: 'bold', color: '#334155' }}>{c.full_name}</td><td style={{ padding: '15px', color: '#475569' }}>{c.email}</td><td style={{ padding: '15px', color: '#475569' }}>{c.phone_number}</td><td style={{ padding: '15px', color: '#0ea5e9', fontWeight: 'bold' }}>{c.preferred_job}</td><td style={{ padding: '15px' }}><span style={{ background: '#e0f2fe', color: '#0369a1', padding: '5px 10px', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold' }}>{c.preferred_country}</span></td>
-                            </tr>
-                          ))}
+                        {candidatesList.length === 0 ? <tr><td colSpan="6" style={{ padding: '30px', textAlign: 'center', color: '#64748b' }}>No candidates found in the database.</td></tr> : 
+                          candidatesList.map((c, index) => {
+                            // Define color coding based on status
+                            const statusColors = {
+                              'Registered': { bg: '#f1f5f9', text: '#475569' },
+                              'Interviewing': { bg: '#fef08a', text: '#854d0e' },
+                              'Visa Processing': { bg: '#e0e7ff', text: '#4338ca' },
+                              'Placed': { bg: '#dcfce7', text: '#166534' },
+                              'Rejected': { bg: '#fee2e2', text: '#991b1b' }
+                            };
+                            const currentStatus = c.status || 'Registered';
+                            const currentStyle = statusColors[currentStatus] || statusColors['Registered'];
+
+                            return (
+                              <tr key={index} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                                <td style={{ padding: '15px', fontWeight: 'bold', color: '#334155' }}>{c.full_name}</td>
+                                <td style={{ padding: '15px', color: '#475569' }}>{c.email}</td>
+                                <td style={{ padding: '15px', color: '#475569' }}>{c.phone_number}</td>
+                                <td style={{ padding: '15px', color: '#0ea5e9', fontWeight: 'bold' }}>{c.preferred_job}</td>
+                                <td style={{ padding: '15px' }}><span style={{ background: '#e0f2fe', color: '#0369a1', padding: '5px 10px', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold' }}>{c.preferred_country}</span></td>
+                                <td style={{ padding: '15px' }}>
+                                  <select 
+                                    value={currentStatus} 
+                                    onChange={(e) => handleStatusChange(c.id, e.target.value)}
+                                    style={{ 
+                                      padding: '6px 10px', 
+                                      borderRadius: '6px', 
+                                      border: '1px solid #cbd5e1', 
+                                      backgroundColor: currentStyle.bg, 
+                                      color: currentStyle.text,
+                                      fontWeight: 'bold',
+                                      cursor: 'pointer',
+                                      outline: 'none'
+                                    }}
+                                  >
+                                    <option value="Registered">Registered</option>
+                                    <option value="Interviewing">Interviewing</option>
+                                    <option value="Visa Processing">Visa Processing</option>
+                                    <option value="Placed">Placed</option>
+                                    <option value="Rejected">Rejected</option>
+                                  </select>
+                                </td>
+                              </tr>
+                            )
+                          })}
                       </tbody>
                     </table>
                   </div>
