@@ -2,7 +2,8 @@ import os
 import re
 import resend
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, File, UploadFile, Form
+import json
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, field_validator
 import mysql.connector
@@ -339,6 +340,7 @@ async def get_all_candidates(request: Request, secret: str = ""):
         if 'db' in locals() and db.is_connected():
             db.close()
 
+#10.
 # ==========================================
 # PHASE 7: JOB BOARD ROUTES (FINAL FIX)
 # ==========================================
@@ -406,3 +408,40 @@ def delete_job_posting(job_id: int, secret: str):
     except Exception as e:
         print(f"Error deleting job: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+    
+
+    #11. ✨ PHASE 8: AI Poster Parsing Route
+@app.post("/admin/parse-poster")
+async def parse_poster(secret: str = Form(...), file: UploadFile = File(...)):
+    if secret != "NextGenAdmin2026":
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
+    try:
+        image_bytes = await file.read()
+        
+        # Give Gemini strict instructions to format the output as JSON
+        prompt = """
+        You are an expert data extractor. Read this recruitment poster and extract the information into a strict JSON format. 
+        Do not include markdown blocks like ```json or 
+```, just return the raw JSON.
+        {
+            "title": "Exact job title",
+            "country": "Country name",
+            "salary": "Salary listed (or 'Salary Discussed on Interview' if none)",
+            "details": "A brief summary of the job details and benefits",
+            "eligibility": "The eligibility criteria listed",
+            "important_notice": "Any urgent or highlighted notices (leave blank if none)"
+        }
+        """
+        
+        image_parts = [{"mime_type": file.content_type, "data": image_bytes}]
+        response = ai_model.generate_content([prompt, image_parts[0]])
+        
+        # Clean the response and parse it into real JSON
+        raw_text = response.text.replace("```json", "").replace("```", "").strip()
+        extracted_data = json.loads(raw_text)
+        
+        return extracted_data
+    except Exception as e:
+        print(f"AI Extraction Error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to parse poster.")
