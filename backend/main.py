@@ -66,6 +66,7 @@ class JobPostingModel(BaseModel):
     salary: str
     details: str
     eligibility: str
+    important_notice: str = ""  # ✨ NEW FIELD
     expiry_date: datetime
 
 class ChatRequest(BaseModel):
@@ -125,21 +126,27 @@ def send_welcome_email(candidate_email: str, candidate_name: str):
         print("❌ Resend API Key missing!", flush=True) 
         raise Exception("Missing RESEND_API_KEY in environment variables")
 
+    # ✨ UPGRADED: Premium Corporate Email Template
     html_content = f"""
     <html>
-        <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 0 auto;">
-            <div style="background-color: #0284c7; padding: 20px; text-align: center;">
-                <h1 style="color: white; margin: 0;">NextGen Consultancy</h1>
-            </div>
-            <div style="padding: 20px; border: 1px solid #ddd; border-top: none;">
-                <h2 style="color: #0284c7;">Welcome, {candidate_name}!</h2>
-                <p>Thank you for registering your profile with us. Our placement team has successfully received your details and secured your spot in our global database.</p>
-                <p>We are currently reviewing placement opportunities across our verified network in the <strong>UAE, Singapore, Malta, and Europe</strong>.</p>
-                <p>Our advisors will reach out to you directly via phone or email as soon as a suitable role matches your specific expertise.</p>
-                <br>
-                <p>Best Regards,</p>
-                <p><strong>The NextGen Placement Team</strong></p>
-                <p style="font-size: 0.9em; color: #666;">Adding Value to Lives!</p>
+        <body style="font-family: 'Segoe UI', Arial, sans-serif; color: #334155; line-height: 1.6; max-width: 600px; margin: 0 auto; background-color: #f8fafc; padding: 20px;">
+            <div style="background-color: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                <div style="text-align: center; padding: 30px 20px; border-bottom: 3px solid #0ea5e9;">
+                    <img src="https://www.nextgen-consultancy.net/assets/logo-DMRHUyYX.svg" alt="NextGen Consultancy" style="height: 60px; width: auto;" />
+                </div>
+                <div style="padding: 40px 30px;">
+                    <h2 style="color: #0f172a; margin-top: 0;">Welcome, {candidate_name}!</h2>
+                    <p>Thank you for registering your profile with us. Our placement team has successfully received your details and secured your spot in our global database.</p>
+                    <p>We are currently reviewing placement opportunities across our verified network in <strong>Europe, the UK, Israel, and Scandinavia</strong>.</p>
+                    <p>Our advisory team will reach out to you directly via phone or email as soon as a suitable role matches your specific expertise.</p>
+                    <br>
+                    <p style="margin-bottom: 5px;">Best Regards,</p>
+                    <p style="margin: 0; font-weight: bold; color: #0ea5e9;">The NextGen Placement Team</p>
+                    <p style="font-size: 0.85em; color: #94a3b8; margin-top: 5px;">Adding Value to Lives!</p>
+                </div>
+                <div style="background-color: #0f172a; color: #94a3b8; text-align: center; padding: 20px; font-size: 0.85em;">
+                    &copy; 2026 NextGen Consultancy. All rights reserved.
+                </div>
             </div>
         </body>
     </html>
@@ -347,15 +354,16 @@ def create_job_posting(job: JobPostingModel, secret: str):
     if secret != "NextGenAdmin2026":
         raise HTTPException(status_code=401, detail="Unauthorized")
         
-    conn = get_db_connection() # Use 'conn'
+    conn = get_db_connection() 
     if not conn: raise HTTPException(status_code=500, detail="DB connection failed")
     try:
         cursor = conn.cursor()
-        sql = """INSERT INTO job_postings (title, country, salary, details, eligibility, expiry_date) 
-                 VALUES (%s, %s, %s, %s, %s, %s)"""
+        # ✨ UPGRADED: Added important_notice to the INSERT query
+        sql = """INSERT INTO job_postings (title, country, salary, details, eligibility, important_notice, expiry_date) 
+                 VALUES (%s, %s, %s, %s, %s, %s, %s)"""
                  
         formatted_date = job.expiry_date.strftime('%Y-%m-%d %H:%M:%S')
-        values = (job.title, job.country, job.salary, job.details, job.eligibility, formatted_date)
+        values = (job.title, job.country, job.salary, job.details, job.eligibility, job.important_notice, formatted_date)
         
         cursor.execute(sql, values)
         conn.commit()

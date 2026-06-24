@@ -66,7 +66,7 @@ function App() {
   const [adminTab, setAdminTab] = useState('candidates'); 
   const [adminJobsList, setAdminJobsList] = useState([]);
   const [jobFormData, setJobFormData] = useState({
-    title: '', country: '', salary: '', details: '', eligibility: '', expiry_date: ''
+    title: '', country: '', salary: '', details: '', eligibility: '', important_notice: '', expiry_date: ''
   });
 
   const [publicJobsList, setPublicJobsList] = useState([]);
@@ -137,7 +137,7 @@ function App() {
       const data = await response.json(); 
       if (response.ok) {
         alert("Job posted successfully!");
-        setJobFormData({ title: '', country: '', salary: '', details: '', eligibility: '', expiry_date: '' });
+        setJobFormData({ title: '', country: '', salary: '', details: '', eligibility: '', important_notice: '', expiry_date: '' });
         fetchAdminJobs(); 
       } else {
         alert(`Backend Error: ${data.detail || JSON.stringify(data)}`);
@@ -439,6 +439,14 @@ function App() {
                 <button onClick={() => setSelectedJob(null)} className="back-btn"><FaChevronLeft size={12}/> Back to Jobs List</button>
                 <h2>{selectedJob.title}</h2>
                 <div className="job-meta-header">
+                  
+                  {/* ✨ NEW: Important Notice Display */}
+                {selectedJob.important_notice && selectedJob.important_notice.trim() !== '' && (
+                  <div style={{ background: '#fffbeb', borderLeft: '4px solid #f59e0b', padding: '15px', borderRadius: '4px', marginBottom: '20px', color: '#b45309', fontWeight: '500' }}>
+                    <strong style={{ display: 'block', marginBottom: '5px' }}>⚠️ Important Notice:</strong>
+                    {selectedJob.important_notice}
+                  </div>
+                )}
                   <span><FaMapMarkerAlt size={16}/> {selectedJob.country}</span>
                   <span className="meta-salary">{selectedJob.salary}</span>
                   <span className="meta-timer-static">📅 {formatStaticDate(selectedJob.expiry_date)}</span>
@@ -576,6 +584,7 @@ function App() {
                         <input type="text" name="salary" placeholder="Salary" value={jobFormData.salary} onChange={handleJobFormChange} required />
                         <textarea name="details" placeholder="Job Details" value={jobFormData.details} onChange={handleJobFormChange} rows="4" style={{ padding: '14px', borderRadius: '8px', border: '1px solid #ddd', fontFamily: 'inherit', resize: 'vertical', width: '100%' }} required></textarea>
                         <textarea name="eligibility" placeholder="Eligibility Criteria" value={jobFormData.eligibility} onChange={handleJobFormChange} rows="4" style={{ padding: '14px', borderRadius: '8px', border: '1px solid #ddd', fontFamily: 'inherit', resize: 'vertical', width: '100%' }} required></textarea>
+                        <textarea name="important_notice" placeholder="Important Notice (Optional - e.g., Fast Track Processing, Specific Visa Requirements)" value={jobFormData.important_notice} onChange={handleJobFormChange} rows="2" style={{ padding: '14px', borderRadius: '8px', border: '1px solid #ddd', fontFamily: 'inherit', resize: 'vertical', width: '100%' }}></textarea>
                         <div style={{ width: '100%' }}>
                           <label style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 'bold', marginBottom: '5px', display: 'block' }}>Post Expiration Date</label>
                           <input type="datetime-local" name="expiry_date" value={jobFormData.expiry_date} onChange={handleJobFormChange} required style={{ width: '100%' }} />
