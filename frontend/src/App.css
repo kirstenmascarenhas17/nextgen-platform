@@ -1163,3 +1163,94 @@ body {
     display: none;
   }
 }
+
+/* =========================================
+   13. ✨ PHASE 8: PREMIUM UI ALIGNMENT
+   ========================================= */
+
+.premium-corporate-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-top: 5px solid #0ea5e9;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+  padding: 40px;
+  margin: 0 auto 50px auto;
+  max-width: 900px;
+  text-align: center;
+  position: relative;
+  z-index: 10;
+}
+
+.trust-ribbon-upgrade {
+  margin-top: -60px;
+}
+
+.trust-ribbon-upgrade .card-subtitle {
+  color: #64748b;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+}
+
+.registration-card-upgrade h2 {
+  color: #0f172a;
+  font-size: 2.2rem;
+  margin-bottom: 10px;
+}
+
+.registration-card-upgrade p {
+  color: #64748b;
+  margin-bottom: 30px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.full-width-input {
+  width: 100%;
+  margin-bottom: 20px;
+  padding: 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.premium-submit-btn {
+  background: #0ea5e9;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: bold;
+  padding: 15px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+  transition: background 0.3s ease;
+}
+
+.premium-submit-btn:hover {
+  background: #0288d1;
+}
+
+.job-timer-static, .meta-timer-static {
+  background: #f0f9ff;
+  color: #0369a1;
+  padding: 8px 15px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: bold;
+  display: inline-block;
+  border: 1px solid #bae6fd;
+}
+
+@media screen and (max-width: 600px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .premium-corporate-card { padding: 25px 15px; }
+}

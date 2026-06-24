@@ -8,60 +8,44 @@ import { IoCheckmarkCircle, IoCheckmarkDoneCircle } from 'react-icons/io5';
 
 const SERVICES_INFO = [
   { 
-    id: 'oil-gas',
-    icon: <FaOilCan />,
-    title: 'Oil and Gas', 
+    id: 'oil-gas', icon: <FaOilCan />, title: 'Oil and Gas', 
     image: 'https://images.unsplash.com/photo-1516937941344-00b4e0337589?auto=format&fit=crop&q=80&w=1200',
     description: "NextGen Consultancy specializes in providing highly skilled and semi-skilled manpower for the global Oil and Gas sector. From rig operations to refinery maintenance, our candidates are rigorously vetted to ensure they meet stringent international safety and technical standards. We provide Riggers, Welders, Safety Officers, and Petroleum Engineers."
   },
   { 
-    id: 'construction',
-    icon: <FaHardHat />,
-    title: 'Construction', 
+    id: 'construction', icon: <FaHardHat />, title: 'Construction', 
     image: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&q=80&w=1200',
     description: "Our expertise in the Construction sector ensures that large-scale infrastructure projects are staffed with competent professionals. We recruit top-tier civil engineers, heavy equipment operators, masons, carpenters, and project managers who are experienced in executing high-value international projects efficiently."
   },
   { 
-    id: 'marine-shipping',
-    icon: <FaShip />,
-    title: 'Marine & Shipping', 
+    id: 'marine-shipping', icon: <FaShip />, title: 'Marine & Shipping', 
     image: 'https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?auto=format&fit=crop&q=80&w=1200',
     description: "We connect maritime employers with certified and experienced shipping personnel. Our marine placement division focuses on sourcing skilled seafarers, marine engineers, deck officers, and shipyard workers who comply with all international maritime regulations and possess a strong track record of safety at sea."
   },
   { 
-    id: 'power-plants',
-    icon: <FaPowerOff />,
-    title: 'Power Plants', 
+    id: 'power-plants', icon: <FaPowerOff />, title: 'Power Plants', 
     image: 'https://images.unsplash.com/photo-1513828583688-c52646db42da?auto=format&fit=crop&q=80&w=1200',
     description: "Power generation requires precise technical expertise. We supply the energy sector with qualified electrical engineers, mechanical technicians, turbine operators, and maintenance crews. Our candidates have extensive experience in working within thermal, nuclear, and renewable energy power plants."
   },
   { 
-    id: 'hospitality',
-    icon: <FaHotel />,
-    title: 'Hospitality', 
+    id: 'hospitality', icon: <FaHotel />, title: 'Hospitality', 
     image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=1200',
-    description: "Supporting the global tourism boom, we provide skilled manpower for luxury hotels, resorts, and cruise liners. Our placement officers vet Chefs, Housekeeping staff, Front Office managers, and F&B supervisors, primarily for clients in UAE, Malta, and Europe."
+    description: "Supporting the global tourism boom, we provide skilled manpower for luxury hotels, resorts, and cruise liners. Our placement officers vet Chefs, Housekeeping staff, Front Office managers, and F&B supervisors, primarily for clients in Europe, Greece, and the UK."
   },
   { 
-    id: 'healthcare',
-    icon: <FaHeartbeat />,
-    title: 'Healthcare', 
+    id: 'healthcare', icon: <FaHeartbeat />, title: 'Healthcare', 
     image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=1200',
     description: "We help international hospitals and clinics secure dedicated medical professionals from India. We specialize in placing Nurses, Lab Technicians, Radiologists, and specialized doctors who hold internationally recognized certifications."
   },
   { 
-    id: 'it-telecom',
-    icon: <FaLaptopCode />,
-    title: 'IT & Telecom', 
+    id: 'it-telecom', icon: <FaLaptopCode />, title: 'IT & Telecom', 
     image: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&q=80&w=1200',
     description: "Bridging the global tech gap, we recruit top Indian IT talent for roles abroad. Our candidates include Software Developers, Network Engineers, Cybersecurity analysts, and Data Scientists experienced in modern tech stacks."
   },
   { 
-    id: 'logistics',
-    icon: <FaTruckLoading />,
-    title: 'Logistics', 
+    id: 'logistics', icon: <FaTruckLoading />, title: 'Logistics', 
     image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=1200',
-    description: "Ensuring global supply chains run smoothly, we source reliable personnel for logistics hubs. We provide Warehouse Managers, Forklift Operators, Supply Chain coordinators, and heavy-duty drivers for Middle Eastern and European clients."
+    description: "Ensuring global supply chains run smoothly, we source reliable personnel for logistics hubs. We provide Warehouse Managers, Forklift Operators, Supply Chain coordinators, and heavy-duty drivers for European and international clients."
   }
 ];
 
@@ -71,7 +55,6 @@ function App() {
   });
   const [statusMessage, setStatusMessage] = useState('');
   const [showScrollTop, setShowScrollTop] = useState(false);
-
   const [currentView, setCurrentView] = useState('home'); 
   const carouselRef = useRef(null);
 
@@ -80,25 +63,16 @@ function App() {
   const [candidatesList, setCandidatesList] = useState([]);
   const [adminError, setAdminError] = useState('');
 
-  // ADMIN STATES
-  const [adminTab, setAdminTab] = useState('candidates');
+  const [adminTab, setAdminTab] = useState('candidates'); 
   const [adminJobsList, setAdminJobsList] = useState([]);
   const [jobFormData, setJobFormData] = useState({
     title: '', country: '', salary: '', details: '', eligibility: '', expiry_date: ''
   });
 
-  // ✨ PHASE 7: PUBLIC JOB BOARD STATES
   const [publicJobsList, setPublicJobsList] = useState([]);
   const [selectedCountryFilter, setSelectedCountryFilter] = useState('All');
   const [searchJobTitle, setSearchJobTitle] = useState('');
   const [selectedJob, setSelectedJob] = useState(null);
-  const [currentTime, setCurrentTime] = useState(new Date());
-
-  // Ticks every 60 seconds to update live countdown timers
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 60000);
-    return () => clearInterval(timer);
-  }, []);
 
   const fetchPublicJobs = async () => {
     try {
@@ -112,17 +86,13 @@ function App() {
     }
   };
 
-  const calculateTimeLeft = (expiryDate) => {
-    const difference = new Date(expiryDate) - currentTime;
-    if (difference <= 0) return "Expired";
-    
-    const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
-    const minutes = Math.floor((difference / 1000 / 60) % 60);
-    
-    if (days > 0) return `${days}d ${hours}h left`;
-    if (hours > 0) return `${hours}h ${minutes}m left`;
-    return `${minutes}m left`;
+  // ✨ PHASE 8: STATIC PROFESSIONAL TIMER
+  const formatStaticDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = date.toLocaleString('default', { month: 'long' });
+    const year = date.getFullYear();
+    return `Valid Till: ${day}, ${month}, ${year}`;
   };
 
   const filteredJobs = publicJobsList.filter(job => {
@@ -164,16 +134,12 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(jobFormData),
       });
-      
-      // ✨ We are extracting the exact error message sent by FastAPI
       const data = await response.json(); 
-      
       if (response.ok) {
-        alert("Job posted successfully! The timer has started.");
+        alert("Job posted successfully!");
         setJobFormData({ title: '', country: '', salary: '', details: '', eligibility: '', expiry_date: '' });
-        fetchAdminJobs(); // Refresh the list
+        fetchAdminJobs(); 
       } else {
-        // ✨ This will now pop up with the EXACT Python error (e.g., "Table doesn't exist" or "Validation Error")
         alert(`Backend Error: ${data.detail || JSON.stringify(data)}`);
       }
     } catch (error) {
@@ -188,7 +154,7 @@ function App() {
         method: 'DELETE'
       });
       if (response.ok) {
-        fetchAdminJobs();
+        fetchAdminJobs(); 
       }
     } catch (error) {
       alert("Error deleting job.");
@@ -220,31 +186,19 @@ function App() {
   }, [currentView]);
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
-
-  const navigateToHome = (e) => {
-    if(e) e.preventDefault();
-    setCurrentView('home');
-    window.scrollTo(0, 0);
-  };
-
-  const navigateToAbout = (e) => {
-    if(e) e.preventDefault();
-    setCurrentView('about');
-    window.scrollTo(0, 0);
-  };
+  const navigateToHome = (e) => { if(e) e.preventDefault(); setCurrentView('home'); window.scrollTo(0, 0); };
+  const navigateToAbout = (e) => { if(e) e.preventDefault(); setCurrentView('about'); window.scrollTo(0, 0); };
 
   const navigateToServices = (service, e) => {
     if(e) e.preventDefault();
     setCurrentView('services');
-    
     setTimeout(() => {
       if (service && service.id) {
         const element = document.getElementById(service.id);
         if (element) {
           const headerOffset = 80;
           const elementPosition = element.getBoundingClientRect().top;
-          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-          window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+          window.scrollTo({ top: elementPosition + window.pageYOffset - headerOffset, behavior: "smooth" });
         }
       } else {
         window.scrollTo(0, 0);
@@ -252,25 +206,27 @@ function App() {
     }, 100);
   };
 
+  const scrollToService = (id, e) => {
+    if(e) e.preventDefault();
+    const element = document.getElementById(id);
+    if (element) {
+      window.scrollTo({ top: element.getBoundingClientRect().top + window.pageYOffset - 80, behavior: "smooth" });
+    }
+  };
+
   const scrollToContact = (e) => {
     if(e) e.preventDefault();
     const footer = document.getElementById('contact');
-    if(footer) {
-      window.scrollTo({ top: footer.offsetTop, behavior: 'smooth' });
-    }
+    if(footer) window.scrollTo({ top: footer.offsetTop, behavior: 'smooth' });
   };
 
   const navigateToRegistration = (e) => {
     if(e) e.preventDefault();
     setCurrentView('home');
-    
     setTimeout(() => {
       const element = document.getElementById('register');
       if (element) {
-        const headerOffset = 80;
-        const elementPosition = element.getBoundingClientRect().top;
-        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-        window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+        window.scrollTo({ top: element.getBoundingClientRect().top + window.pageYOffset - 80, behavior: "smooth" });
       }
     }, 100);
   };
@@ -285,7 +241,7 @@ function App() {
         setCandidatesList(data.candidates);
         setIsAuthenticated(true);
         setAdminError('');
-        fetchAdminJobs();
+        fetchAdminJobs(); 
       } else {
         setAdminError('Incorrect PIN. Access Denied.');
       }
@@ -295,27 +251,18 @@ function App() {
   };
 
   const handleCopyToExcel = () => {
-    if (candidatesList.length === 0) {
-      alert("No data available to copy.");
-      return;
-    }
+    if (candidatesList.length === 0) return alert("No data available to copy.");
     let excelData = "Name\tEmail\tPhone\tTarget Job\tPreferred Location\n";
     candidatesList.forEach(c => {
       excelData += `${c.full_name}\t${c.email}\t${c.phone_number}\t${c.preferred_job}\t${c.preferred_country}\n`;
     });
     navigator.clipboard.writeText(excelData).then(() => {
       alert("✅ Data copied to clipboard! Open Excel and press Ctrl+V to paste.");
-    }).catch(err => {
-      alert("Failed to copy data. Your browser might be blocking clipboard access.");
-    });
+    }).catch(() => alert("Failed to copy data."));
   };
 
-  const scrollLeft = () => {
-    if (carouselRef.current) carouselRef.current.scrollBy({ left: -300, behavior: 'smooth' });
-  };
-  const scrollRight = () => {
-    if (carouselRef.current) carouselRef.current.scrollBy({ left: 300, behavior: 'smooth' });
-  };
+  const scrollLeft = () => { if (carouselRef.current) carouselRef.current.scrollBy({ left: -300, behavior: 'smooth' }); };
+  const scrollRight = () => { if (carouselRef.current) carouselRef.current.scrollBy({ left: 300, behavior: 'smooth' }); };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -329,8 +276,7 @@ function App() {
 
   const handleSubmit = async (e) => {
     e.preventDefault(); 
-    const phoneRegex = /^[6-9]\d{9}$/;
-    if (!phoneRegex.test(formData.phone_number)) {
+    if (!/^[6-9]\d{9}$/.test(formData.phone_number)) {
       setStatusMessage('Error: Please enter a valid 10-digit Indian phone number.');
       return; 
     }
@@ -361,7 +307,6 @@ function App() {
         <div className="logo-section" onClick={navigateToHome} style={{ cursor: 'pointer' }}>
           <img src={logoImg} alt="NextGen Consultancy" className="main-logo-full" />
         </div>
-        
         <nav className="desktop-nav">
           <a onClick={navigateToHome}>Home</a>
           <a onClick={navigateToAbout}>About Us</a>
@@ -379,36 +324,33 @@ function App() {
               <div className="home-hero-overlay"></div>
               <div className="hero-text" id="home-hero">
                 <h2>Your Global Career Starts Here.</h2>
-                <p>Over a Decade of Global Connections. NextGen Consultancy connects Indian talent with premium international employers. Register your profile today, and our placement team will match you with the perfect opportunity.</p>
+                <p>Over a Decade of Global Connections. NextGen Consultancy connects Indian talent with premium international employers across Europe, the UK, and Israel. Register your profile today.</p>
               </div>
             </section>
 
             <section className="content-area home-page-layout">
-              <div className="trust-ribbon" style={{ marginBottom: '50px', marginTop: '-60px', position: 'relative', zIndex: 10 }}>
-                <p>Specialized Placement Pathways For:</p>
-                <div className="trust-badges" style={{ flexWrap: 'wrap', gap: '15px', justifyContent: 'center' }}>
+              {/* ✨ PHASE 8: UPGRADED TRUST RIBBON */}
+              <div className="premium-corporate-card trust-ribbon-upgrade">
+                <p className="card-subtitle">Specialized Placement Pathways For:</p>
+                <div className="trust-badges">
+                  <span><IoCheckmarkCircle className="check-icon" /> Europe</span>
                   <span><IoCheckmarkCircle className="check-icon" /> Israel</span>
-                  <span><IoCheckmarkCircle className="check-icon" /> Portugal</span>
+                  <span><IoCheckmarkCircle className="check-icon" /> United Kingdom</span>
+                  <span><IoCheckmarkCircle className="check-icon" /> Finland</span>
                   <span><IoCheckmarkCircle className="check-icon" /> Greece</span>
-                  <span><IoCheckmarkCircle className="check-icon" /> Austria</span>
-                  <span><IoCheckmarkCircle className="check-icon" /> UAE</span>
+                  <span><IoCheckmarkCircle className="check-icon" /> Romania</span>
                 </div>
               </div>
 
-              {/* ✨ NEW: PREMIUM CORPORATE JOB BOARD BANNER */}
               <div className="premium-job-banner" onClick={navigateToJobs}>
                 <div className="banner-content">
-                  <div className="banner-icon-wrapper">
-                    <FaBriefcase className="banner-icon" />
-                  </div>
+                  <div className="banner-icon-wrapper"><FaBriefcase className="banner-icon" /></div>
                   <div className="banner-text-wrapper">
                     <h2>Active Global Placements</h2>
                     <p>Explore current international job openings and apply directly.</p>
                   </div>
                 </div>
-                <div className="banner-arrow">
-                  <FaArrowRight />
-                </div>
+                <div className="banner-arrow"><FaArrowRight /></div>
               </div>
 
               <div id="services" className="services-section">
@@ -428,25 +370,28 @@ function App() {
                 </div>
               </div>
 
-              <div className="registration-section central-form" id="register" style={{ marginTop: '60px' }}>
+              {/* ✨ PHASE 8: UPGRADED REGISTRATION FORM */}
+              <div className="premium-corporate-card registration-card-upgrade" id="register">
                 <h2>Candidate Registration</h2>
                 <p>Secure your spot in our global database.</p>
                 <form className="apply-form" onSubmit={handleSubmit}>
-                  <input type="text" name="full_name" placeholder="Full Name" value={formData.full_name} onChange={handleInputChange} required />
-                  <input type="email" name="email" placeholder="Email Address" value={formData.email} onChange={handleInputChange} required />
-                  <input type="tel" name="phone_number" placeholder="Phone Number (Required)" value={formData.phone_number} onChange={handlePhoneChange} required />
-                  
-                  <input type="text" name="preferred_job" placeholder="Target Job Role (e.g., Rigger, Nurse, Engineer)" value={formData.preferred_job} onChange={handleInputChange} required />
-                  
-                  <select name="preferred_country" className="country-dropdown" value={formData.preferred_country} onChange={handleInputChange} required>
-                    <option value="" disabled>Select Preferred Country...</option>
-                    <option value="Israel">Israel</option>
-                    <option value="Europe">Europe (Portugal, Greece, Austria, etc.)</option>
-                    <option value="UAE">United Arab Emirates (UAE)</option>
-                    <option value="Singapore">Singapore</option>
-                    <option value="Any">Open to Any Location</option>
-                  </select>
-                  <button type="submit">Submit Profile</button>
+                  <div className="form-grid">
+                    <input type="text" name="full_name" placeholder="Full Name" value={formData.full_name} onChange={handleInputChange} required />
+                    <input type="email" name="email" placeholder="Email Address" value={formData.email} onChange={handleInputChange} required />
+                    <input type="tel" name="phone_number" placeholder="Phone Number (Required)" value={formData.phone_number} onChange={handlePhoneChange} required />
+                    <input type="text" name="preferred_job" placeholder="Target Job Role (e.g., Rigger, Nurse, Engineer)" value={formData.preferred_job} onChange={handleInputChange} required />
+                  </div>
+                  {/* ✨ OPEN TEXT FIELD FOR COUNTRY */}
+                  <input 
+                    type="text" 
+                    name="preferred_country" 
+                    placeholder="Preferred Country (e.g., Israel, UK, Finland, Europe)" 
+                    value={formData.preferred_country} 
+                    onChange={handleInputChange} 
+                    required 
+                    className="full-width-input"
+                  />
+                  <button type="submit" className="premium-submit-btn">Submit Profile</button>
                   {statusMessage && <p className="status-msg">{statusMessage}</p>}
                 </form>
               </div>
@@ -454,7 +399,6 @@ function App() {
           </>
         )}
 
-        {/* ✨ NEW: DYNAMIC JOB BOARD VIEW */}
         {currentView === 'jobs' && (
           <section className="jobs-page-layout">
             {!selectedJob ? (
@@ -462,23 +406,10 @@ function App() {
                 <div className="jobs-header">
                   <h1 className="jobs-title">Current Job Openings</h1>
                   <div className="jobs-filter-group">
-                    <input 
-                      type="text" 
-                      className="job-search-bar" 
-                      placeholder="Search job title..." 
-                      value={searchJobTitle} 
-                      onChange={(e) => setSearchJobTitle(e.target.value)} 
-                    />
-                    <select 
-                      className="country-filter" 
-                      value={selectedCountryFilter} 
-                      onChange={(e) => setSelectedCountryFilter(e.target.value)}
-                    >
+                    <input type="text" className="job-search-bar" placeholder="Search job title..." value={searchJobTitle} onChange={(e) => setSearchJobTitle(e.target.value)} />
+                    <select className="country-filter" value={selectedCountryFilter} onChange={(e) => setSelectedCountryFilter(e.target.value)}>
                       <option value="All">All Countries</option>
-                      {/* Pull unique countries from the active jobs list */}
-                      {[...new Set(publicJobsList.map(job => job.country))].map(c => (
-                        <option key={c} value={c}>{c}</option>
-                      ))}
+                      {[...new Set(publicJobsList.map(job => job.country))].map(c => <option key={c} value={c}>{c}</option>)}
                     </select>
                   </div>
                 </div>
@@ -492,8 +423,9 @@ function App() {
                         <h3>{job.title}</h3>
                         <p className="job-country"><FaMapMarkerAlt size={14}/> {job.country}</p>
                         <p className="job-salary">{job.salary}</p>
-                        <div className="job-timer">
-                          ⏳ {calculateTimeLeft(job.expiry_date)}
+                        {/* ✨ PHASE 8: STATIC TIMER UI */}
+                        <div className="job-timer-static">
+                          📅 {formatStaticDate(job.expiry_date)}
                         </div>
                       </div>
                     ))
@@ -502,14 +434,12 @@ function App() {
               </>
             ) : (
               <div className="job-deep-dive">
-                <button onClick={() => setSelectedJob(null)} className="back-btn">
-                  <FaChevronLeft size={12}/> Back to Jobs List
-                </button>
+                <button onClick={() => setSelectedJob(null)} className="back-btn"><FaChevronLeft size={12}/> Back to Jobs List</button>
                 <h2>{selectedJob.title}</h2>
                 <div className="job-meta-header">
                   <span><FaMapMarkerAlt size={16}/> {selectedJob.country}</span>
                   <span className="meta-salary">{selectedJob.salary}</span>
-                  <span className="meta-timer">⏳ Expires in: {calculateTimeLeft(selectedJob.expiry_date)}</span>
+                  <span className="meta-timer-static">📅 {formatStaticDate(selectedJob.expiry_date)}</span>
                 </div>
                 
                 <div className="job-details-box">
@@ -523,8 +453,7 @@ function App() {
                 </div>
 
                 <button className="apply-now-btn" onClick={() => {
-                  // ✨ AUTO-FILL MAGIC: Fill form with target job and navigate to register!
-                  setFormData({ ...formData, preferred_job: selectedJob.title, preferred_country: selectedJob.country === 'Israel' || selectedJob.country === 'UAE' || selectedJob.country === 'Singapore' ? selectedJob.country : 'Europe' });
+                  setFormData({ ...formData, preferred_job: selectedJob.title, preferred_country: selectedJob.country });
                   navigateToRegistration();
                 }}>
                   Apply Now for this Position
@@ -540,13 +469,8 @@ function App() {
               <h2 className="sidebar-header">Job Sectors</h2>
               <div className="sidebar-links-container">
                 {SERVICES_INFO.map((service) => (
-                  <button 
-                    key={service.id} 
-                    className="sidebar-tab"
-                    onClick={(e) => scrollToService(service.id, e)}
-                  >
-                    <span className="sidebar-icon">{service.icon}</span> 
-                    {service.title}
+                  <button key={service.id} className="sidebar-tab" onClick={(e) => scrollToService(service.id, e)}>
+                    <span className="sidebar-icon">{service.icon}</span> {service.title}
                   </button>
                 ))}
               </div>
@@ -554,10 +478,7 @@ function App() {
             <div className="services-main-content">
               {SERVICES_INFO.map((service) => (
                 <div id={service.id} key={service.id} className="service-detail-block">
-                  <div className="service-header-row">
-                    <div className="header-icon">{service.icon}</div>
-                    <h2>{service.title}</h2>
-                  </div>
+                  <div className="service-header-row"><div className="header-icon">{service.icon}</div><h2>{service.title}</h2></div>
                   <img src={service.image} alt={service.title} />
                   <p>{service.description}</p>
                   <div className="detail-divider"></div>
@@ -570,11 +491,7 @@ function App() {
         {currentView === 'about' && (
           <section className="about-page-layout">
             <div className="about-hero">
-              <img 
-                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=2000" 
-                alt="NextGen Team" 
-                className="about-hero-image" 
-              />
+              <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=2000" alt="NextGen Team" className="about-hero-image" />
               <div className="about-hero-overlay"></div>
               <h1 className="about-hero-title">About Us</h1> 
             </div>
@@ -589,7 +506,7 @@ function App() {
                 <ul className="about-list">
                   <li><IoCheckmarkDoneCircle className="about-check" /> <strong>Verified Employers:</strong> We only partner with recognized international companies, ensuring your safety and career growth.</li>
                   <li><IoCheckmarkDoneCircle className="about-check" /> <strong>End-to-End Support:</strong> From pre-interview training to visa documentation, our team guides you through every step.</li>
-                  <li><IoCheckmarkDoneCircle className="about-check" /> <strong>Global Reach:</strong> Specialized pathways into Europe, Israel, UAE, and Singapore across 8+ major industrial sectors.</li>
+                  <li><IoCheckmarkDoneCircle className="about-check" /> <strong>Global Reach:</strong> Specialized pathways into Europe, Israel, the UK, and Scandinavia across 8+ major industrial sectors.</li>
                 </ul>
               </div>
               <div className="about-text-block">
@@ -608,78 +525,40 @@ function App() {
               <div style={{ maxWidth: '400px', margin: '0 auto', background: 'white', padding: '40px', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}>
                 <p style={{textAlign: 'center', marginBottom: '25px', color: '#475569'}}>Enter secure PIN to access candidate database.</p>
                 <form onSubmit={handleAdminLogin} style={{display: 'flex', flexDirection: 'column', gap: '15px'}}>
-                  <input 
-                    type="password" 
-                    placeholder="Enter Security PIN" 
-                    value={adminPassword} 
-                    onChange={(e) => setAdminPassword(e.target.value)} 
-                    style={{padding: '15px', borderRadius: '8px', border: '1px solid #ccc', fontSize: '1.1rem'}}
-                  />
-                  <button type="submit" style={{background: '#0ea5e9', color: 'white', padding: '15px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold', fontSize: '1.1rem'}}>
-                    Authenticate
-                  </button>
+                  <input type="password" placeholder="Enter Security PIN" value={adminPassword} onChange={(e) => setAdminPassword(e.target.value)} style={{padding: '15px', borderRadius: '8px', border: '1px solid #ccc', fontSize: '1.1rem'}}/>
+                  <button type="submit" style={{background: '#0ea5e9', color: 'white', padding: '15px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold', fontSize: '1.1rem'}}>Authenticate</button>
                 </form>
                 {adminError && <p style={{color: '#ef4444', textAlign: 'center', marginTop: '20px', fontWeight: 'bold'}}>{adminError}</p>}
               </div>
             ) : (
               <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', padding: '20px' }}>
-                
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #f1f5f9', paddingBottom: '20px', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
                   <div style={{ display: 'flex', gap: '15px' }}>
-                    <button 
-                      onClick={() => setAdminTab('candidates')} 
-                      style={{ background: adminTab === 'candidates' ? '#0ea5e9' : '#e2e8f0', color: adminTab === 'candidates' ? 'white' : '#475569', border: 'none', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
-                      📋 Candidates
-                    </button>
-                    <button 
-                      onClick={() => setAdminTab('jobs')} 
-                      style={{ background: adminTab === 'jobs' ? '#0ea5e9' : '#e2e8f0', color: adminTab === 'jobs' ? 'white' : '#475569', border: 'none', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
-                      📢 Manage Jobs
-                    </button>
+                    <button onClick={() => setAdminTab('candidates')} style={{ background: adminTab === 'candidates' ? '#0ea5e9' : '#e2e8f0', color: adminTab === 'candidates' ? 'white' : '#475569', border: 'none', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>📋 Candidates</button>
+                    <button onClick={() => setAdminTab('jobs')} style={{ background: adminTab === 'jobs' ? '#0ea5e9' : '#e2e8f0', color: adminTab === 'jobs' ? 'white' : '#475569', border: 'none', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>📢 Manage Jobs</button>
                   </div>
-                  <div>
-                    <button onClick={() => {setIsAuthenticated(false); setAdminPassword('');}} style={{ background: '#ef4444', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>
-                      🔒 Lock Dashboard
-                    </button>
-                  </div>
+                  <button onClick={() => {setIsAuthenticated(false); setAdminPassword('');}} style={{ background: '#ef4444', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>🔒 Lock Dashboard</button>
                 </div>
 
                 {adminTab === 'candidates' && (
                   <div style={{ overflowX: 'auto' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
                       <h3 style={{ color: '#0ea5e9', margin: 0 }}>Total Registered Candidates: {candidatesList.length}</h3>
-                      <button onClick={handleCopyToExcel} style={{ background: '#10b981', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>
-                        📋 Copy for Excel
-                      </button>
+                      <button onClick={handleCopyToExcel} style={{ background: '#10b981', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>📋 Copy for Excel</button>
                     </div>
                     <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                       <thead>
                         <tr style={{ background: '#f0f9ff', color: '#0c4a6e' }}>
-                          <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Name</th>
-                          <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Email</th>
-                          <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Phone</th>
-                          <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Target Job</th>
-                          <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Preferred Location</th>
+                          <th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Name</th><th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Email</th><th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Phone</th><th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Target Job</th><th style={{ padding: '15px', borderBottom: '2px solid #bae6fd' }}>Preferred Location</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {candidatesList.length === 0 ? (
-                          <tr><td colSpan="5" style={{ padding: '30px', textAlign: 'center', color: '#64748b' }}>No candidates found in the database.</td></tr>
-                        ) : (
+                        {candidatesList.length === 0 ? <tr><td colSpan="5" style={{ padding: '30px', textAlign: 'center', color: '#64748b' }}>No candidates found in the database.</td></tr> : 
                           candidatesList.map((c, index) => (
                             <tr key={index} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                              <td style={{ padding: '15px', fontWeight: 'bold', color: '#334155' }}>{c.full_name}</td>
-                              <td style={{ padding: '15px', color: '#475569' }}>{c.email}</td>
-                              <td style={{ padding: '15px', color: '#475569' }}>{c.phone_number}</td>
-                              <td style={{ padding: '15px', color: '#0ea5e9', fontWeight: 'bold' }}>{c.preferred_job}</td>
-                              <td style={{ padding: '15px' }}>
-                                <span style={{ background: '#e0f2fe', color: '#0369a1', padding: '5px 10px', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold' }}>
-                                  {c.preferred_country}
-                                </span>
-                              </td>
+                              <td style={{ padding: '15px', fontWeight: 'bold', color: '#334155' }}>{c.full_name}</td><td style={{ padding: '15px', color: '#475569' }}>{c.email}</td><td style={{ padding: '15px', color: '#475569' }}>{c.phone_number}</td><td style={{ padding: '15px', color: '#0ea5e9', fontWeight: 'bold' }}>{c.preferred_job}</td><td style={{ padding: '15px' }}><span style={{ background: '#e0f2fe', color: '#0369a1', padding: '5px 10px', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold' }}>{c.preferred_country}</span></td>
                             </tr>
-                          ))
-                        )}
+                          ))}
                       </tbody>
                     </table>
                   </div>
@@ -690,41 +569,31 @@ function App() {
                     <div style={{ background: '#f8fafc', padding: '25px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
                       <h3 style={{ color: '#0f172a', marginBottom: '20px' }}>Publish New Job</h3>
                       <form onSubmit={handleJobSubmit} className="apply-form">
-                        <input type="text" name="title" placeholder="Job Title (e.g. Mechanical Site Manager)" value={jobFormData.title} onChange={handleJobFormChange} required />
-                        <input type="text" name="country" placeholder="Country (e.g. Israel)" value={jobFormData.country} onChange={handleJobFormChange} required />
-                        <input type="text" name="salary" placeholder="Salary (e.g. ₹2.5 - ₹4.5 Lakhs Per Month)" value={jobFormData.salary} onChange={handleJobFormChange} required />
-                        
-                        <textarea name="details" placeholder="Job Details (Bullet points: Contract, Accommodation, etc.)" value={jobFormData.details} onChange={handleJobFormChange} rows="4" style={{ padding: '14px', borderRadius: '8px', border: '1px solid #ddd', fontFamily: 'inherit', resize: 'vertical', width: '100%' }} required></textarea>
-                        
-                        <textarea name="eligibility" placeholder="Eligibility Criteria (Experience, Skills, etc.)" value={jobFormData.eligibility} onChange={handleJobFormChange} rows="4" style={{ padding: '14px', borderRadius: '8px', border: '1px solid #ddd', fontFamily: 'inherit', resize: 'vertical', width: '100%' }} required></textarea>
-                        
+                        <input type="text" name="title" placeholder="Job Title" value={jobFormData.title} onChange={handleJobFormChange} required />
+                        <input type="text" name="country" placeholder="Country" value={jobFormData.country} onChange={handleJobFormChange} required />
+                        <input type="text" name="salary" placeholder="Salary" value={jobFormData.salary} onChange={handleJobFormChange} required />
+                        <textarea name="details" placeholder="Job Details" value={jobFormData.details} onChange={handleJobFormChange} rows="4" style={{ padding: '14px', borderRadius: '8px', border: '1px solid #ddd', fontFamily: 'inherit', resize: 'vertical', width: '100%' }} required></textarea>
+                        <textarea name="eligibility" placeholder="Eligibility Criteria" value={jobFormData.eligibility} onChange={handleJobFormChange} rows="4" style={{ padding: '14px', borderRadius: '8px', border: '1px solid #ddd', fontFamily: 'inherit', resize: 'vertical', width: '100%' }} required></textarea>
                         <div style={{ width: '100%' }}>
-                          <label style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 'bold', marginBottom: '5px', display: 'block' }}>Post Expiration Date & Time</label>
+                          <label style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 'bold', marginBottom: '5px', display: 'block' }}>Post Expiration Date</label>
                           <input type="datetime-local" name="expiry_date" value={jobFormData.expiry_date} onChange={handleJobFormChange} required style={{ width: '100%' }} />
                         </div>
-
                         <button type="submit" style={{ background: '#10b981', width: '100%' }}>Publish Job Post</button>
                       </form>
                     </div>
-
                     <div>
                       <h3 style={{ color: '#0f172a', marginBottom: '20px' }}>Active Job Postings ({adminJobsList.length})</h3>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', maxHeight: '600px', overflowY: 'auto', paddingRight: '10px' }}>
-                        {adminJobsList.length === 0 ? (
-                          <p style={{ color: '#64748b', textAlign: 'center', padding: '20px', background: '#f8fafc', borderRadius: '8px' }}>No active jobs. Expired jobs hide automatically.</p>
-                        ) : (
+                        {adminJobsList.length === 0 ? <p style={{ color: '#64748b', textAlign: 'center', padding: '20px', background: '#f8fafc', borderRadius: '8px' }}>No active jobs. Expired jobs hide automatically.</p> : 
                           adminJobsList.map((job) => (
                             <div key={job.id} style={{ padding: '15px', border: '1px solid #e2e8f0', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'white' }}>
                               <div>
                                 <h4 style={{ margin: '0 0 5px 0', color: '#0ea5e9' }}>{job.title}</h4>
-                                <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b', fontWeight: 'bold' }}>{job.country} • Valid till: {new Date(job.expiry_date).toLocaleDateString()}</p>
+                                <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b', fontWeight: 'bold' }}>{job.country} • {formatStaticDate(job.expiry_date)}</p>
                               </div>
-                              <button onClick={() => handleJobDelete(job.id)} style={{ background: '#fee2e2', color: '#ef4444', border: 'none', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>
-                                Delete
-                              </button>
+                              <button onClick={() => handleJobDelete(job.id)} style={{ background: '#fee2e2', color: '#ef4444', border: 'none', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>Delete</button>
                             </div>
-                          ))
-                        )}
+                          ))}
                       </div>
                     </div>
                   </div>
@@ -733,14 +602,10 @@ function App() {
             )}
           </section>
         )}
-
       </main>
 
       <footer className="premium-footer" id="contact">
-        <div 
-          className="footer-grid" 
-          style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '30px', alignItems: 'start' }}
-        >
+        <div className="footer-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '30px', alignItems: 'start' }}>
           <div className="footer-col">
             <h3>NextGen Consultancy</h3>
             <p>Your Gateway to Global Careers.</p>
@@ -749,19 +614,9 @@ function App() {
           <div className="footer-col">
             <h3>Our Offices</h3>
             <h4 style={{ fontSize: '14px', marginBottom: '5px', color: '#38bdf8', fontWeight: 'bold' }}>Head Office</h4>
-            <p style={{ fontSize: '14px', marginBottom: '15px', lineHeight: '1.6' }}>
-              <FaMapMarkerAlt size={14} style={{ marginRight: '8px', color: '#38bdf8', verticalAlign: 'top', marginTop: '3px' }} /> 
-              <span style={{ display: 'inline-block', width: '85%' }}>
-                21/165, Jyoti Cottage, Old Anand Nagar Lane, Behind Vakola Police Station, Above Dyandeep Bank, Santacruz East, Mumbai - 400055
-              </span>
-            </p>
+            <p style={{ fontSize: '14px', marginBottom: '15px', lineHeight: '1.6' }}><FaMapMarkerAlt size={14} style={{ marginRight: '8px', color: '#38bdf8', verticalAlign: 'top', marginTop: '3px' }} /> <span style={{ display: 'inline-block', width: '85%' }}>21/165, Jyoti Cottage, Old Anand Nagar Lane, Behind Vakola Police Station, Above Dyandeep Bank, Santacruz East, Mumbai - 400055</span></p>
             <h4 style={{ fontSize: '14px', marginBottom: '5px', color: '#38bdf8', fontWeight: 'bold' }}>Branch Office</h4>
-            <p style={{ fontSize: '14px', marginBottom: '15px', lineHeight: '1.6' }}>
-              <FaMapMarkerAlt size={14} style={{ marginRight: '8px', color: '#38bdf8', verticalAlign: 'top', marginTop: '3px' }} /> 
-              <span style={{ display: 'inline-block', width: '85%' }}>
-                Shop No 2, A Wing, Krishna Prestige, MIDC Road, Opp Krishna Garden, Mira Road East, Thane - 401107
-              </span>
-            </p>
+            <p style={{ fontSize: '14px', marginBottom: '15px', lineHeight: '1.6' }}><FaMapMarkerAlt size={14} style={{ marginRight: '8px', color: '#38bdf8', verticalAlign: 'top', marginTop: '3px' }} /> <span style={{ display: 'inline-block', width: '85%' }}>Shop No 2, A Wing, Krishna Prestige, MIDC Road, Opp Krishna Garden, Mira Road East, Thane - 401107</span></p>
           </div>
           <div className="footer-col">
             <h3>Contact Us</h3>
@@ -769,7 +624,6 @@ function App() {
               <p style={{ fontSize: '14px', marginBottom: '12px' }}><FaPhoneAlt size={12} style={{ marginRight: '8px', color: '#38bdf8' }} /> +91 9076011522 / +91 9076011499</p>
               <p style={{ fontSize: '14px', marginBottom: '12px' }}><FaPhoneAlt size={12} style={{ marginRight: '8px', color: '#38bdf8' }} /> +91 9076012125 / +91 9076011175</p>
               <p style={{ fontSize: '14px', marginBottom: '12px' }}><a href="mailto:careers@nextgen-consultancy.net" style={{ color: 'inherit', textDecoration: 'none' }}><FaEnvelope size={12} style={{ marginRight: '8px', color: '#38bdf8' }} /> careers@nextgen-consultancy.net</a></p>
-              <p style={{ fontSize: '14px' }}><a href="mailto:info.nextgenconsultancy1@gmail.com" style={{ color: 'inherit', textDecoration: 'none' }}><FaEnvelope size={12} style={{ marginRight: '8px', color: '#38bdf8' }} /> info.nextgenconsultancy1@gmail.com</a></p>
             </div>
           </div>
           <div className="footer-col">
@@ -786,15 +640,11 @@ function App() {
         </div>
       </footer>
 
-      <a href="https://wa.me/919076011175?text=Hi!%20I%20am%20interested%20in%20global%20job%20opportunities%20with%20NextGen." target="_blank" rel="noopener noreferrer" className="floating-whatsapp">
-        <FaWhatsapp size={24} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
-        WhatsApp Us
+      <a href="https://wa.me/919076011175" target="_blank" rel="noopener noreferrer" className="floating-whatsapp">
+        <FaWhatsapp size={24} style={{ marginRight: '8px', verticalAlign: 'middle' }} /> WhatsApp Us
       </a>
 
-      {showScrollTop && (
-        <button onClick={scrollToTop} className="scroll-to-top"><FaArrowUp size={18} /></button>
-      )}
-
+      {showScrollTop && <button onClick={scrollToTop} className="scroll-to-top"><FaArrowUp size={18} /></button>}
       <AiChatWidget />
     </div>
   )
