@@ -68,6 +68,8 @@ function App() {
   const [jobFormData, setJobFormData] = useState({
     title: '', country: '', salary: '', details: '', eligibility: '', important_notice: '', expiry_date: ''
   });
+  const [posterPreview, setPosterPreview] = useState(null);
+  const [isExtracting, setIsExtracting] = useState(false);
 
   const [publicJobsList, setPublicJobsList] = useState([]);
   const [selectedCountryFilter, setSelectedCountryFilter] = useState('All');
@@ -145,6 +147,43 @@ function App() {
     } catch (error) {
       alert(`Network/Server Crash: ${error.message}`);
     }
+  };
+
+  const handlePosterUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setPosterPreview(URL.createObjectURL(file));
+    setIsExtracting(true);
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('secret', adminPassword);
+
+    try {
+      const response = await fetch('https://nextgen-api-11jg.onrender.com/admin/parse-poster', {
+        method: 'POST',
+        body: formData, 
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setJobFormData(prev => ({
+          ...prev,
+          title: data.title || '',
+          country: data.country || '',
+          salary: data.salary || '',
+          details: data.details || '',
+          eligibility: data.eligibility || '',
+          important_notice: data.important_notice || ''
+        }));
+      } else {
+        alert("Failed to parse poster. AI might be busy.");
+      }
+    } catch (error) {
+      alert("Network error while parsing poster.");
+    }
+    setIsExtracting(false);
   };
 
   const handleJobDelete = async (id) => {
@@ -439,7 +478,7 @@ function App() {
                 <button onClick={() => setSelectedJob(null)} className="back-btn"><FaChevronLeft size={12}/> Back to Jobs List</button>
                 <h2>{selectedJob.title}</h2>
                 <div className="job-meta-header">
-                  
+
                   {/* ✨ NEW: Important Notice Display */}
                 {selectedJob.important_notice && selectedJob.important_notice.trim() !== '' && (
                   <div style={{ background: '#fffbeb', borderLeft: '4px solid #f59e0b', padding: '15px', borderRadius: '4px', marginBottom: '20px', color: '#b45309', fontWeight: '500' }}>
@@ -576,8 +615,27 @@ function App() {
 
                 {adminTab === 'jobs' && (
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '40px' }}>
-                    <div style={{ background: '#f8fafc', padding: '25px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                      <h3 style={{ color: '#0f172a', marginBottom: '20px' }}>Publish New Job</h3>
+                    <div style={{ background: '#f8fafc', padding: '25px', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <h3 style={{ color: '#0f172a', margin: 0 }}>Publish New Job</h3>
+                        
+                        {/* ✨ NEW: AI Poster Upload Button */}
+                        <div style={{ position: 'relative' }}>
+                          <input type="file" accept="image/*" onChange={handlePosterUpload} style={{ opacity: 0, position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', cursor: 'pointer' }} />
+                          <button type="button" style={{ background: '#3b82f6', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '6px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            {isExtracting ? '🤖 Extracting Data...' : '📸 Auto-Fill via Poster'}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* ✨ NEW: Visual Poster Preview Area */}
+                      {posterPreview && (
+                        <div style={{ background: '#e2e8f0', borderRadius: '8px', padding: '10px', textAlign: 'center' }}>
+                          <p style={{ margin: '0 0 10px 0', fontSize: '0.85rem', color: '#475569', fontWeight: 'bold' }}>Poster Preview</p>
+                          <img src={posterPreview} alt="Uploaded Poster" style={{ maxHeight: '200px', maxWidth: '100%', borderRadius: '4px', border: '1px solid #cbd5e1' }} />
+                        </div>
+                      )}
+
                       <form onSubmit={handleJobSubmit} className="apply-form">
                         <input type="text" name="title" placeholder="Job Title" value={jobFormData.title} onChange={handleJobFormChange} required />
                         <input type="text" name="country" placeholder="Country" value={jobFormData.country} onChange={handleJobFormChange} required />
