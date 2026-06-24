@@ -70,6 +70,10 @@ class JobPostingModel(BaseModel):
     important_notice: str = ""  # ✨ NEW FIELD
     expiry_date: datetime
 
+class StatusUpdateModel(BaseModel):
+    status: str
+    secret: str
+
 class ChatRequest(BaseModel):
     message: str
     session_id: str
@@ -314,31 +318,27 @@ async def health_check():
 
 # 9. ✨ NEW: The Admin Dashboard Route
 @app.get("/admin/candidates")
-async def get_all_candidates(request: Request, secret: str = ""):
-    # Simple security lock (Change this PIN to whatever you want!)
+def get_all_candidates(secret: str):
     if secret != "NextGenAdmin2026":
-        raise HTTPException(status_code=401, detail="Unauthorized Access")
-        
-    db = get_db_connection()
-    if not db:
-        raise HTTPException(status_code=500, detail="Database connection failed")
-        
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
+    conn = get_db_connection()
+    if not conn: raise HTTPException(status_code=500, detail="DB connection failed")
     try:
-        cursor = db.cursor(dictionary=True)
-        # Fetch all candidates
-        cursor.execute("SELECT * FROM candidates")
-        candidates = cursor.fetchall()
-        # Reverse the list so the newest registrations are at the top
-        candidates.reverse() 
+        cursor = conn.cursor()
+        # Fetching all candidate data including the new status
+        cursor.execute("SELECT id, full_name, email, phone_number, preferred_country, preferred_job, status FROM candidates ORDER BY id DESC")
+        
+        # Map the tuple results into a clean dictionary list
+        columns = [col[0] for col in cursor.description]
+        candidates = [dict(zip(columns, row)) for row in cursor.fetchall()]
+        
+        cursor.close()
+        conn.close()
         return {"candidates": candidates}
     except Exception as e:
-        print(f"🚨 ADMIN ROUTE FAILED: {str(e)}", flush=True)
-        raise HTTPException(status_code=500, detail=f"Server Error: {str(e)}")
-    finally:
-        if 'cursor' in locals():
-            cursor.close()
-        if 'db' in locals() and db.is_connected():
-            db.close()
+        print(f"Error fetching candidates: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 #10.
 # ==========================================
