@@ -126,13 +126,13 @@ def send_welcome_email(candidate_email: str, candidate_name: str):
         print("❌ Resend API Key missing!", flush=True) 
         raise Exception("Missing RESEND_API_KEY in environment variables")
 
-    # ✨ UPGRADED: Premium Corporate Email Template
+    # ✨ UPGRADED: Premium Corporate Email Template (Now with Bulletproof PNG)
     html_content = f"""
     <html>
         <body style="font-family: 'Segoe UI', Arial, sans-serif; color: #334155; line-height: 1.6; max-width: 600px; margin: 0 auto; background-color: #f8fafc; padding: 20px;">
             <div style="background-color: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
                 <div style="text-align: center; padding: 30px 20px; border-bottom: 3px solid #0ea5e9;">
-                    <img src="https://www.nextgen-consultancy.net/assets/logo-DMRHUyYX.svg" alt="NextGen Consultancy" style="width: 240px; max-width: 100%; height: auto; display: block; margin: 0 auto;" />
+                    <img src="https://i.postimg.cc/MHSrKGLX/logo2.png" alt="NextGen Consultancy" width="240" style="width: 240px; max-width: 100%; height: auto; display: block; margin: 0 auto;" />
                 </div>
                 <div style="padding: 40px 30px;">
                     <h2 style="color: #0f172a; margin-top: 0;">Welcome, {candidate_name}!</h2>
