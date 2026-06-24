@@ -339,7 +339,27 @@ def get_all_candidates(secret: str):
     except Exception as e:
         print(f"Error fetching candidates: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
+# ✨ PHASE 6: Route to update a candidate's pipeline status
+@app.put("/admin/candidates/{candidate_id}/status")
+def update_candidate_status(candidate_id: int, payload: StatusUpdateModel):
+    if payload.secret != "NextGenAdmin2026":
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
+    conn = get_db_connection()
+    if not conn: raise HTTPException(status_code=500, detail="DB connection failed")
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE candidates SET status = %s WHERE id = %s", 
+            (payload.status, candidate_id)
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return {"message": "Candidate pipeline status updated successfully!"}
+    except Exception as e:
+        print(f"Error updating status: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 #10.
 # ==========================================
 # PHASE 7: JOB BOARD ROUTES (FINAL FIX)
