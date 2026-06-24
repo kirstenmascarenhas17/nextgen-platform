@@ -311,6 +311,8 @@ function App() {
           <a onClick={navigateToHome}>Home</a>
           <a onClick={navigateToAbout}>About Us</a>
           <a onClick={(e) => navigateToServices(null, e)}>Services</a>
+          {/* ✨ NEW: Jobs Navigation Link */}
+          <a onClick={navigateToJobs}>Jobs</a>
           <a onClick={scrollToContact}>Contact Us</a> 
           <a onClick={navigateToRegistration} className="nav-register-btn">Candidate Registration</a> 
         </nav>
