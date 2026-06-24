@@ -602,6 +602,25 @@ function App() {
               </div>
             ) : (
               <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', padding: '20px' }}>
+                {/* ✨ NEW: Admin Analytics Command Center */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '30px' }}>
+                  <div style={{ background: '#f0fdf4', padding: '20px', borderRadius: '12px', border: '1px solid #bbf7d0', textAlign: 'center' }}>
+                    <h3 style={{ margin: 0, fontSize: '2.5rem', color: '#166534' }}>{candidatesList.length}</h3>
+                    <p style={{ margin: '5px 0 0', color: '#15803d', fontWeight: 'bold' }}>Total Candidates</p>
+                  </div>
+                  <div style={{ background: '#eff6ff', padding: '20px', borderRadius: '12px', border: '1px solid #bfdbfe', textAlign: 'center' }}>
+                    <h3 style={{ margin: 0, fontSize: '2.5rem', color: '#1e40af' }}>{adminJobsList.length}</h3>
+                    <p style={{ margin: '5px 0 0', color: '#1d4ed8', fontWeight: 'bold' }}>Active Job Posts</p>
+                  </div>
+                  <div style={{ background: '#fffbeb', padding: '20px', borderRadius: '12px', border: '1px solid #fde68a', textAlign: 'center' }}>
+                    <h3 style={{ margin: 0, fontSize: '2.5rem', color: '#b45309' }}>{candidatesList.filter(c => ['Interviewing', 'Visa Processing'].includes(c.status)).length}</h3>
+                    <p style={{ margin: '5px 0 0', color: '#b45309', fontWeight: 'bold' }}>Active Pipeline</p>
+                  </div>
+                  <div style={{ background: '#faf5ff', padding: '20px', borderRadius: '12px', border: '1px solid #e9d5ff', textAlign: 'center' }}>
+                    <h3 style={{ margin: 0, fontSize: '2.5rem', color: '#6b21a8' }}>{candidatesList.filter(c => c.status === 'Placed').length}</h3>
+                    <p style={{ margin: '5px 0 0', color: '#7e22ce', fontWeight: 'bold' }}>Successful Placements</p>
+                  </div>
+                </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #f1f5f9', paddingBottom: '20px', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
                   <div style={{ display: 'flex', gap: '15px' }}>
                     <button onClick={() => setAdminTab('candidates')} style={{ background: adminTab === 'candidates' ? '#0ea5e9' : '#e2e8f0', color: adminTab === 'candidates' ? 'white' : '#475569', border: 'none', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>📋 Candidates</button>
