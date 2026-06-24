@@ -70,6 +70,7 @@ function App() {
   });
   const [posterPreview, setPosterPreview] = useState(null);
   const [isExtracting, setIsExtracting] = useState(false);
+  const [isImageEnlarged, setIsImageEnlarged] = useState(false);
 
   const [publicJobsList, setPublicJobsList] = useState([]);
   const [selectedCountryFilter, setSelectedCountryFilter] = useState('All');
@@ -628,11 +629,35 @@ function App() {
                         </div>
                       </div>
 
-                      {/* ✨ NEW: Visual Poster Preview Area */}
+                      {/* ✨ UPGRADED: Visual Poster Preview Area (With Remove & Zoom) */}
                       {posterPreview && (
-                        <div style={{ background: '#e2e8f0', borderRadius: '8px', padding: '10px', textAlign: 'center' }}>
-                          <p style={{ margin: '0 0 10px 0', fontSize: '0.85rem', color: '#475569', fontWeight: 'bold' }}>Poster Preview</p>
-                          <img src={posterPreview} alt="Uploaded Poster" style={{ maxHeight: '200px', maxWidth: '100%', borderRadius: '4px', border: '1px solid #cbd5e1' }} />
+                        <div style={{ background: '#e2e8f0', borderRadius: '8px', padding: '15px', textAlign: 'center', position: 'relative' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                            <p style={{ margin: '0', fontSize: '0.9rem', color: '#475569', fontWeight: 'bold' }}>Poster Preview</p>
+                            <button type="button" onClick={() => setPosterPreview(null)} style={{ background: '#ef4444', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold' }}>
+                              🗑️ Remove
+                            </button>
+                          </div>
+                          <img 
+                            src={posterPreview} 
+                            alt="Uploaded Poster" 
+                            onClick={() => setIsImageEnlarged(true)}
+                            title="Click to enlarge"
+                            style={{ maxHeight: '200px', maxWidth: '100%', borderRadius: '4px', border: '1px solid #cbd5e1', cursor: 'zoom-in', transition: 'transform 0.2s' }} 
+                          />
+                        </div>
+                      )}
+
+                      {/* ✨ NEW: Full Screen Image Overlay Modal */}
+                      {isImageEnlarged && posterPreview && (
+                        <div 
+                          onClick={() => setIsImageEnlarged(false)} 
+                          style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 99999, display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'zoom-out' }}
+                        >
+                          <img src={posterPreview} alt="Enlarged Poster" style={{ maxHeight: '90vh', maxWidth: '90vw', borderRadius: '8px', boxShadow: '0 10px 40px rgba(0,0,0,0.5)' }} />
+                          <p style={{ position: 'absolute', bottom: '20px', color: 'white', background: 'rgba(0,0,0,0.5)', padding: '8px 15px', borderRadius: '20px', fontSize: '0.9rem' }}>
+                            Click anywhere to close
+                          </p>
                         </div>
                       )}
 
