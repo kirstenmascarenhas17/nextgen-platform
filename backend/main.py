@@ -419,17 +419,17 @@ async def parse_poster(secret: str = Form(...), file: UploadFile = File(...)):
     try:
         image_bytes = await file.read()
         
-        # Give Gemini strict instructions to format the output as JSON
+        # Give Gemini strict instructions to format the output as JSON and use newlines
         prompt = """
         You are an expert data extractor. Read this recruitment poster and extract the information into a strict JSON format. 
-        Do not include markdown blocks like ```json or 
-```, just return the raw JSON.
+        Do not include markdown blocks like ```json or ```, just return the raw JSON.
+        CRITICAL: For the "details" and "eligibility" fields, use actual newline characters (\\n) to separate different points so they appear as a clean list.
         {
             "title": "Exact job title",
             "country": "Country name",
             "salary": "Salary listed (or 'Salary Discussed on Interview' if none)",
-            "details": "A brief summary of the job details and benefits",
-            "eligibility": "The eligibility criteria listed",
+            "details": "Job details and benefits. Use \\n to separate each point.",
+            "eligibility": "Eligibility criteria. Use \\n to separate each point.",
             "important_notice": "Any urgent or highlighted notices (leave blank if none)"
         }
         """
