@@ -297,16 +297,19 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus, secret: adminPassword })
       });
+      
       if (response.ok) {
         // Update the UI instantly without needing to refresh the page
         setCandidatesList(prevList => 
           prevList.map(c => c.id === candidateId ? { ...c, status: newStatus } : c)
         );
       } else {
-        alert("Failed to update candidate status.");
+        // ✨ NEW: Tell us exactly what Python is complaining about!
+        const errorData = await response.json();
+        alert(`Backend Error: ${JSON.stringify(errorData.detail)} | Candidate ID: ${candidateId}`);
       }
     } catch (error) {
-      alert("Network error while updating status.");
+      alert(`Network error while updating status: ${error.message}`);
     }
   };
 
