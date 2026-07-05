@@ -368,17 +368,7 @@ function App() {
       
       <header className="navbar sticky-header">
         <div className="logo-section" onClick={navigateToHome} style={{ cursor: 'pointer' }}>
-          <img 
-              src={logoImg} 
-              alt="NextGen Consultancy" 
-              className="main-logo-full" 
-              style={{ 
-                maxWidth: '100% !important', // Force mobile scaling
-                width: '200px !important',    // Force a specific mobile width
-                height: 'auto !important',   // Force ratio locking
-                objectFit: 'contain' 
-              }} 
-            />
+          <img src={logoImg} alt="NextGen Consultancy" className="main-logo-full" />
         </div>
         <nav className="desktop-nav">
           <a onClick={navigateToHome}>Home</a>
