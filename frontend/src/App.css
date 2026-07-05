@@ -1258,10 +1258,16 @@ body {
 
 /* Mobile responsive fix for the navbar logo */
 @media (max-width: 768px) {
+  .logo-section {
+    max-width: 70vw !important; /* Forces the container to stay inside the screen */
+    display: flex;
+    align-items: center;
+  }
+
   .main-logo-full {
-    width: 200px !important;
-    max-width: 100vw !important;
+    width: 160px !important; /* Definitively smaller to test the sizing */
+    max-width: 100% !important;
     height: auto !important;
-    object-fit: contain;
+    object-fit: contain !important;
   }
 }
