@@ -1288,22 +1288,32 @@ body {
 }
 
 
-/* FORCE NAVBAR TO WRAP ON MOBILE & TABLETS */
+/* FORCE NAVBAR TO STACK VERTICALLY ON MOBILE & TABLETS */
 @media (max-width: 992px) {
-  .navbar {
-    flex-wrap: wrap !important;      /* Allows items to drop to a new line */
-    justify-content: center !important; /* Centers everything nicely */
+  .navbar, .sticky-header {
+    flex-direction: column !important; /* Stacks the logo directly on top of the links */
+    height: auto !important;           /* Kills any fixed height so it can actually fit everything */
     padding: 15px 10px !important;
   }
   
-  .desktop-nav {
-    flex-wrap: wrap !important;
+  .logo-section {
+    width: 100% !important;
+    display: flex !important;
     justify-content: center !important;
-    margin-top: 15px !important;     /* Adds space between logo and links */
-    gap: 15px !important;            /* Slightly reduces the gap between links to fit better */
+    margin-bottom: 15px !important;
   }
 
-  .logo-section {
-    margin-bottom: 5px !important;
+  .main-logo-full {
+    width: 240px !important;
+    max-width: 90vw !important; /* Guarantees it will never exceed the screen width */
+    height: auto !important;
+    object-fit: contain !important;
+  }
+
+  .desktop-nav {
+    width: 100% !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 12px !important;
   }
 }
