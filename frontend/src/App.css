@@ -1259,14 +1259,16 @@ body {
 /* Mobile responsive fix for the navbar logo */
 @media (max-width: 768px) {
   .logo-section {
-    max-width: 70vw !important; /* Forces the container to stay inside the screen */
+    flex-shrink: 0 !important; /* Prevents nav links from squishing the logo box */
+    overflow: visible !important; /* Stops the invisible box from cutting the image */
+    width: 100% !important;
     display: flex;
-    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px; /* Gives a little breathing room above the links */
   }
 
   .main-logo-full {
-    width: 160px !important; /* Definitively smaller to test the sizing */
-    max-width: 100% !important;
+    width: 220px !important; 
     height: auto !important;
     object-fit: contain !important;
   }
