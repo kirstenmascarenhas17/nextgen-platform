@@ -41,14 +41,18 @@ body {
 }
 
 .logo-section {
+  flex-shrink: 0 !important; 
+  min-width: 220px; 
   display: flex;
   align-items: center;
+  overflow: visible !important;
 }
 
 .main-logo-full {
-  height: 65px; /* Perfectly sizes the wide logo for the navbar */
-  width: auto;
-  object-fit: contain;
+  width: 220px !important;
+  max-width: 100% !important;
+  height: auto !important;
+  object-fit: contain !important;
   transition: transform 0.2s ease;
 }
 
@@ -1271,5 +1275,14 @@ body {
     width: 220px !important; 
     height: auto !important;
     object-fit: contain !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .logo-section {
+    min-width: auto;
+    width: 100% !important;
+    justify-content: center;
+    margin-bottom: 15px; 
   }
 }
