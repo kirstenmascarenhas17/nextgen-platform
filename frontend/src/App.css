@@ -1286,3 +1286,24 @@ body {
     margin-bottom: 15px; 
   }
 }
+
+
+/* FORCE NAVBAR TO WRAP ON MOBILE & TABLETS */
+@media (max-width: 992px) {
+  .navbar {
+    flex-wrap: wrap !important;      /* Allows items to drop to a new line */
+    justify-content: center !important; /* Centers everything nicely */
+    padding: 15px 10px !important;
+  }
+  
+  .desktop-nav {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    margin-top: 15px !important;     /* Adds space between logo and links */
+    gap: 15px !important;            /* Slightly reduces the gap between links to fit better */
+  }
+
+  .logo-section {
+    margin-bottom: 5px !important;
+  }
+}
