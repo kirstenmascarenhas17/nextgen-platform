@@ -95,7 +95,8 @@ def get_db_connection():
             password=db_password,
             database=db_name,
             ssl_ca="ca.pem",      
-            ssl_verify_cert=True  
+            ssl_verify_cert=True,  
+            charset="utf8mb4"
         )
         return connection
     except Error as e:
@@ -441,9 +442,10 @@ async def parse_poster(secret: str = Form(...), file: UploadFile = File(...)):
         
         # Give Gemini strict instructions to format the output as JSON and use newlines
         prompt = """
-        You are an expert data extractor. Read this recruitment poster and extract the information into a strict JSON format. 
+        You are an expert data extractor. Read this recruitment poster and extract the information into a strict JSON format.
         Do not include markdown blocks like ```json or ```, just return the raw JSON.
-        CRITICAL: For the "details" and "eligibility" fields, use actual newline characters (\\n) to separate different points so they appear as a clean list.
+        CRITICAL RULE: You MUST extract the text in the EXACT original language used on the poster. Do NOT translate the text to English. If the poster is in Kannada, Hindi, or any other language, the JSON values must remain in that exact language and script.
+        CRITICAL: For the "details" and "eligibility" fields, use actual newline characters (\\n) to separate different points so they appear properly formatted.
         {
             "title": "Exact job title",
             "country": "Country name",
